@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Ant project implementing targets automatically called by the Eclipse
+ project builder on clean and build.
+ 
+ Copyright (c) 2011 LeanPulse. All rights reserved.
+ 
+ Author: Aurélien PROST (a.prost@leanpulse.com)
+ Version: $Rev$
+-->
+<project name="BibAnt-auto" basedir="..">
+	
+	<!-- Delete jar files on clean -->
+	<target name="autoClean">
+		<delete file="src/lib/bibant.jar"/>
+	</target>
+	
+	<!-- Package class files on build -->
+	<target name="autoBuild">
+		<jar destfile="src/lib/bibant.jar">
+			<fileset dir="bin/java" excludes="**/*.html"/>
+		</jar>
+	</target>
+
+</project>

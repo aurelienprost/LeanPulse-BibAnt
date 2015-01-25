@@ -1,0 +1,175 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+ Copyright (c) 2012 LeanPulse. All rights reserved.
+ 
+ Author: Aurélien PROST (a.prost@leanpulse.com)
+-->
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../ext/ant/stylesheets/style.css">
+<link rel="shortcut icon" type="image/x-icon" href="../images/favicon.ico">
+<title>Xml2Pdf Task</title>
+</head>
+
+<body>
+
+	<h2>
+		<a name="xml2pdf">Xml2Pdf</a>
+	</h2>
+	
+	<h3>Description</h3>
+	
+	<p>
+		Converts XSL-FO documents to PDF. Can also convert raw XML files to PDF thanks to a provided XSLT stylesheet
+		that will be used to first transform the raw XML data to XSL-FO.
+	</p>
+	<p>
+		<strong>Note:</strong> By default, files are only converted if the source file is newer than the destination file, or when the destination
+		file does not exist. However, you can explicitly overwrite files with the <code>force</code> attribute.
+	</p>
+	<p>
+		<em>For more information about the XSL-FO format, please report to the <a href="http://www.w3schools.com/xslfo/" target="_blank">W3C tutorial</a>
+		and <a href="http://www.w3.org/TR/xsl" target="_blank">W3C specification</a>.<br/>
+		To learn more on the XSLT technology, please report to the <a href="http://www.w3schools.com/xsl/" target="_blank">W3C tutorial</a>
+		and <a href="http://www.w3.org/TR/xslt" target="_blank">W3C specification</a>.</em>
+	</p>
+	
+	<h3>Parameters</h3>
+	
+	<table border="1" cellpadding="2" cellspacing="0">
+		<tr>
+			<td valign="top"><b>Attribute</b></td>
+			<td valign="top"><b>Description</b></td>
+			<td align="center" valign="top"><b>Required</b></td>
+		</tr>
+		<tr>
+			<td valign="top">fofile</td>
+			<td valign="top">XSL-FO input file to be rendered.</td>
+			<td valign="top" align="center">Yes, unless a nested filset element is used or the
+				<code>xmlfile</code> and <code>xsltfile</code> attributes are set.</td>
+		</tr>
+		<tr>
+			<td valign="top">xmlfile</td>
+			<td valign="top">Raw XML input file.</td>
+			<td valign="top" align="center" rowspan="2">Yes, if no <code>fofile</code> is specified.</td>
+		</tr>
+		<tr>
+			<td valign="top">xsltfile</td>
+			<td valign="top">XSLT file which will format the <code>xmlfile</code> to XSL-FO that will
+				then be rendered.</td>
+		</tr>
+		<tr>
+			<td valign="top">outfile</td>
+			<td valign="top">The output file.</td>
+			<td valign="top" align="center">Yes, unless a nested filset element is used.</td>
+		</tr>
+		<tr>
+			<td valign="top">outdir</td>
+			<td valign="top">The output directory.</td>
+			<td valign="top" align="center">No, unless a nested filset element is used.<br/>
+				If no fileset is used and the output directory is defined as well as <code>outfile</code>,
+				the output file attribute will only define the name of the output, and its path will be
+				given by <code>outdir</code>.</td>
+		</tr>
+		<tr>
+			<td valign="top">force</td>
+			<td valign="top">Recreate target files, even if they are newer than their corresponding
+				source files.</td>
+			<td valign="top" align="center">No, defaults to <code>false</code>.</td>
+		</tr>
+		<tr>
+			<td valign="top">basedir</td>
+			<td valign="top">Base directory to resolve relative references (e.g., graphics files) within
+				the FO document.</td>
+			<td valign="top" align="center">No<br/>
+				For single input file, default is to use the location of that file.</td>
+		</tr>
+		<tr>
+			<td valign="top">relativebase</td>
+			<td valign="top">For fileset usage only. A value of <code>true</code> specifies using the location
+				of each .fo file as the base directory for resolving relative file references located within that .fo file.<br/>
+				A value of <code>false</code> specifies using the value of <code>basedir</code> for all files within the fileset,
+				or just the	current working directory if <code>basedir</code> is not specified.</td>
+			<td valign="top" align="center">No, defaults to <code>false</code>.</td>
+		</tr>
+		<tr>
+			<td valign="top">userconfig</td>
+			<td valign="top">User configuration file (details
+				<a href="http://xmlgraphics.apache.org/fop/1.0/configuration.html" target="_blank">here</a>).</td>
+			<td valign="top" align="center">No</td>
+		</tr>
+		<tr>
+			<td valign="top">logFiles</td>
+			<td valign="top">Controls whether the names of the files that are processed are logged or not.</td>
+			<td valign="top" align="center">No, defaults to <code>true</code>.</td>
+		</tr>
+		<tr>
+			<td valign="top">failonerror</td>
+			<td valign="top">Controls whether or not an exception is thrown if an error occurs during rendering.</td>
+			<td valign="top" align="center">No, defaults to <code>true</code>.</td>
+		</tr>
+	</table>
+	
+	<h3>Parameters specified as nested elements</h3>
+
+	<h4>fileset</h4>
+	<p>
+		<a href="../ext/ant/Types/fileset.html">FileSet</a>s are used to specify multiple files to be rendered.<br/>
+		If <code>xsltfile</code> isn't specified, those files have to be valid XSL-FO documents. Otherwise, they can be raw XML
+		that will be formatted to XSL-FO by the provided XSLT, to then be rendered to PDF.
+	</p>
+	
+	<h4>XSLT parameter</h4>
+	<p>
+		Use nested <code>&lt;xsltparam&gt;</code> elements to specify parameters for the XSLT. This is only useful of an XSLT is used.
+	</p>
+	<table border="1" cellpadding="2" cellspacing="0">
+		<tr>
+			<td valign="top"><b>Attribute</b></td>
+			<td valign="top"><b>Description</b></td>
+			<td valign="top" align="center"><b>Required</b></td>
+		</tr>
+		<tr>
+			<td valign="top">name</td>
+			<td valign="top">The name of the parameter.</td>
+			<td valign="top" align="center">Yes</td>
+		</tr>
+		<tr>
+			<td valign="top">value</td>
+			<td valign="top">The value of the parameter.</td>
+			<td valign="top" align="center">Yes</td>
+		</tr>
+	</table>
+
+	<h3>Examples</h3>
+	
+	<p>The following example renders a single XSL-FO file to a PDF document:</p>
+	<pre>&lt;xml2pdf fofile=&quot;foDocument.fo&quot; outfile=&quot;pdfDocument.pdf&quot; /&gt;</pre>
+	
+	<p>This example converts all XSL-FO files within an entire directory to PDF:</p>
+	<pre>&lt;xml2pdf outdir=&quot;../dest/dir&quot;&gt;
+  &lt;fileset dir=&quot;../fo/dir&quot;&gt;
+    &lt;include name=&quot;*.fo&quot;/&gt;
+  &lt;/fileset&gt;
+&lt;/xml2pdf&gt;</pre>
+
+	<p>The following example transforms and converts a single XML to PDF:</p>
+	<pre>&lt;xml2pdf xmlfile=&quot;data.xml&quot; xsltfile=&quot;stylesheet.xsl&quot; outfile=&quot;document.pdf&quot; /&gt;</pre>
+	
+	<p>This example transforms and converts all XML files within an entire directory to PDF:</p>
+	<pre>&lt;xml2pdf xsltfile=&quot;stylesheet.xsl&quot; outdir=&quot;../dest/dir&quot;&gt;
+  &lt;fileset dir=&quot;../xml/dir&quot;&gt;
+    &lt;include name=&quot;*.xml&quot;/&gt;
+  &lt;/fileset&gt;
+&lt;/xml2pdf&gt;
+    </pre>
+
+	<p>
+		<em>The <code>xml2pdf</code> task relies on <a href="http://xmlgraphics.apache.org/fop/index.html" target="_blank">Apache FOP</a>
+		to print format XSL-FO documents.</em>
+	</p>
+
+</body>
+</html>

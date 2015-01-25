@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+ Copyright (c) 2012 LeanPulse. All rights reserved.
+ 
+ Author: Aurélien PROST (a.prost@leanpulse.com)
+-->
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../ext/ant/stylesheets/style.css">
+<link rel="shortcut icon" type="image/x-icon" href="../images/favicon.ico">
+<title>PdfMerge Task</title>
+</head>
+
+<body>
+
+	<h2>
+		<a name="pdfmerge">PdfMerge</a>
+	</h2>
+	
+	<h3>Description</h3>
+	
+	<p>
+		Merges PDF files to a single document.
+	</p>
+	
+	<h3>Parameters</h3>
+	
+	<table border="1" cellpadding="2" cellspacing="0">
+		<tr>
+			<td valign="top"><b>Attribute</b></td>
+			<td valign="top"><b>Description</b></td>
+			<td align="center" valign="top"><b>Required</b></td>
+		</tr>
+		<tr>
+			<td valign="top">tofile</td>
+			<td valign="top">The output document.</td>
+			<td valign="top" align="center">Yes</td>
+		</tr>
+		<tr>
+			<td valign="top">force</td>
+			<td valign="top">Recreate the output document, even if it is newer than the source documents.</td>
+			<td valign="top" align="center">No; defaults to false.</td>
+		</tr>
+	</table>
+	
+	<h3>Parameters specified as nested elements</h3>
+
+	<h4>fileset or any other resource collection</h4>
+	<p>
+		<a href="../ext/ant/Types/resources.html#collection">Resource Collection</a>s
+		are used to select groups of PDFs to merge.
+	</p>
+	<p>
+		<strong>Important Note:</strong> certain resource collection types such as <a href="../ext/ant/Types/fileset.html">fileset</a>,
+		<a href="../ext/ant/Types/dirset.html">dirset</a> and <a href="../ext/ant/Types/resources.html#files">files</a> are undefined
+		in terms of order. To merge the documents, it is essential to specify explicitly the order to finally get the result you were
+		expecting. For unordered collections, you can explicitly specify the order by using the
+		<a href="../ext/ant/Types/resources.html#sort">sort</a> element.
+	</p>
+
+	<h3>Example</h3>
+	
+	<p><b>Merge all PDFs from a directory and its sub-directories in the resources' natural order</b></p>
+	<pre>&lt;pdfmerge tofile=&quot;alldocs.pdf&quot;&gt;
+  &lt;sort&gt;
+    &lt;fileset dir=&quot;pdf_dir&quot; includes=&quot;**/*.pdf&quot;/&gt;
+  &lt;/sort&gt;
+&lt;/pdfmerge&gt;</pre>
+
+</body>
+</html>

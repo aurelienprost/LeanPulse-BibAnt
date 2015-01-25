@@ -1,0 +1,272 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+ Copyright (c) 2012 LeanPulse. All rights reserved.
+ 
+ Author: Aurélien PROST (a.prost@leanpulse.com)
+-->
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="ext/ant/stylesheets/style.css">
+<link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico">
+<title>Using LeanPulse BibAnt</title>
+</head>
+
+<body>
+
+<h1>Using LeanPulse BibAnt</h1>
+
+<p>
+	If you've read the <i><a href="intro.html">Introduction</a></i> chapter, you may already guess
+	that using BibAnt is about writing a script which is then executed by the tool. That's exactly
+	what we will be doing in this chapter, write a simple BibAnt script to generate our first
+	documentation package, also referenced here as a <i>bible</i>.
+</p>
+<p>
+	If you're not familiar with Apache Ant (on which BibAnt is based), we do recommend to first read
+	the <i><a href="ext/ant/using.html">Using Apache Ant</a></i> chapter of the Ant manual. You will
+	then be able to understand the overall structure of an Ant (and so BibAnt) buildfile as well as
+	the main concepts of <i>project</i>, <i>target</i>, <i>task</i> and <i>property</i>. When you
+	start feeling dizzy with too much explanations about <i>classpath</i> elements, you can come back
+	here before loosing yourself in the Java code build process. The primary mission of Ant is in fact
+	to build Java projects whereas we are here interested in building documentation packages.
+</p>
+
+<h3>Set the Goal</h3>
+<p>
+	Let's assume we have a set of Word documents (*.doc or *.docx) in a folder <code>docs</code>:
+</p>
+<blockquote><pre>
+<i>Current Working Directory</i>
+           |
+           +---- docs
+                  |
+                  +---- document1.doc
+                  +---- document2.docx
+                  +---- ...
+</pre></blockquote>
+<p>
+	We'd like to compile those documents in a consistent, PDF-only bible that includes a nice index
+	with the titles and authors of the sub-documents as well as links to directly navigate to them:
+</p>
+<blockquote><pre>
+<i>Current Working Directory</i>
+           |
+           +---- bible
+                   |
+                   +---- index.pdf
+                   +---- pdf
+                          |
+                          +---- document1.pdf
+                          +---- document2.pdf
+                          +---- ...
+</pre></blockquote>
+
+<h3>Develop the Script</h3>
+<p style="margin-bottom: 0;">
+	So now, to achieve the goal we just set, what needs to be done? The list below gives the steps
+	we need to perform.<br/>
+	After a quick look at the <a href="tasks/tasksoverview.html">Tasks</a> provided	with BibAnt, we can
+	also already guess which task must be used to implement each one of the steps:
+</p>
+<div style="float: left;">
+	<ol>
+		<li>Prepare the directory structure for the bible,</li>
+		<li>Create the index document:
+			<ol type="a">
+				<li>Extract the metadata (title, author, etc.) from the Word files,</li>
+				<li>Render those metadata to a PDF document,</li>
+			</ol>
+		</li>
+		<li>Convert the Word documents to PDF.</li>
+	</ol>
+</div>
+<div style="float: left;">
+	<p>
+		&nbsp;&nbsp;--&gt;&nbsp;&nbsp;<a href="ext/ant/Tasks/mkdir.html">Mkdir</a><br/>
+		<br/>
+		&nbsp;&nbsp;--&gt;&nbsp;&nbsp;<a href="tasks/extractmetadata.html">ExtractMetadata</a><br/>
+		&nbsp;&nbsp;--&gt;&nbsp;&nbsp;<a href="tasks/xml2pdf.html">Xml2Pdf</a><br/>
+		&nbsp;&nbsp;--&gt;&nbsp;&nbsp;<a href="tasks/print2pdf.html">Print2Pdf</a> or <a href="tasks/word2pdf.html">Word2Pdf</a><br/>
+	</p>
+</div>
+<div style="clear: both;">
+<p>
+	Let's put all this together in a BibAnt script that we call <i>build.xml</i> (so it can be
+	automatically detected by BibAnt) and save in our current working directory:
+</p>
+<pre>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;project name=&quot;MyBibAntProject&quot; basedir=&quot;.&quot; default=&quot;pack&quot;&gt;
+
+  &lt;!-- Set global properties for this build --&gt;
+  &lt;property name=&quot;docs.dir&quot; location=&quot;docs&quot;/&gt;
+  &lt;property name=&quot;bible.dir&quot; location=&quot;bible&quot;/&gt;
+  &lt;property name=&quot;pdf.dir&quot; location=&quot;${bible.dir}/pdf&quot;/&gt;
+  &lt;property name=&quot;meta.file&quot; location=&quot;docMetadata.xml&quot;/&gt;
+  &lt;property name=&quot;style.file&quot; location=&quot;bible.xsl&quot;/&gt;
+  &lt;property name=&quot;index.file&quot; location=&quot;${bible.dir}/index.pdf&quot;/&gt;
+  
+  &lt;target name=&quot;init&quot;&gt;
+    &lt;!-- 1. Create the bible directory structure --&gt;
+    &lt;mkdir dir=&quot;${pdf.dir}&quot;/&gt;
+  &lt;/target&gt;
+  
+  &lt;target name=&quot;createIndex&quot; depends=&quot;init&quot;&gt;
+    &lt;!-- 2.a Extract the metadata (title, author, etc.) from the Word documents --&gt;
+    &lt;extractmetadata metafile=&quot;${meta.file}&quot;&gt;
+      &lt;fileset dir=&quot;${docs.dir}&quot;&gt;
+        &lt;include name=&quot;*.doc&quot;/&gt;
+        &lt;include name=&quot;*.docx&quot;/&gt;
+      &lt;/fileset&gt;
+    &lt;/extractmetadata&gt;
+    &lt;!-- 2.b Render those metadata to PDF --&gt;
+    &lt;xml2pdf xmlfile=&quot;${meta.file}&quot; xsltfile=&quot;${style.file}&quot; outfile=&quot;${index.file}&quot;/&gt;
+  &lt;/target&gt;
+  
+  &lt;target name=&quot;convertDocs&quot; depends=&quot;init&quot;&gt;
+    &lt;!-- 3. Convert the word documents to PDF --&gt;
+    &lt;word2pdf todir=&quot;${pdf.dir}&quot;&gt;
+      &lt;fileset dir=&quot;${docs.dir}&quot;&gt;
+        &lt;include name=&quot;*.doc&quot;/&gt;
+        &lt;include name=&quot;*.docx&quot;/&gt;
+      &lt;/fileset&gt;
+    &lt;/word2pdf&gt;
+  &lt;/target&gt;
+  
+  &lt;target name=&quot;pack&quot; depends=&quot;createIndex,convertDocs&quot;&gt;
+    &lt;!-- Bonus: pack the bible in a ZIP ! --&gt;
+    &lt;zip basedir=&quot;${bible.dir}&quot; destfile=&quot;bible.zip&quot;/&gt;
+  &lt;/target&gt;
+&lt;/project&gt;</pre>
+<p>
+</div>
+<p>
+	The script is quite easy to understand as it directly translates the steps we described before. And did
+	you notice we've even included a bonus which automatically packs the bible in a ZIP archive?
+</p>
+<p>
+	So we're done and ready to run the script... Unfortunately, not yet... The last thing we need to do is to
+	write the stylesheet that will be used to render the index, referenced as <i>bible.xsl</i> in our BibAnt
+	script above. This stylesheet is responsible for the layout and styling of the index document. It will
+	transform the raw data in <i>docMetadata.xml</i> to a valid XSL-FO document, which is then rendered to PDF.
+</p>
+<p>
+	Let's create the stylesheet <i>bible.xsl</i> in the current working directory with the following content:
+</p>
+<pre>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;xsl:stylesheet xmlns:fo=&quot;http://www.w3.org/1999/XSL/Format&quot; xmlns:xsl=&quot;http://www.w3.org/1999/XSL/Transform&quot;
+    xmlns:fn=&quot;http://www.w3.org/2005/xpath-functions&quot; xmlns:bib=&quot;http://www.leanpulse.com/schemas/bibant/2012/core&quot;
+    exclude-result-prefixes=&quot;xsl fn bib&quot; version=&quot;2.0&quot;&gt;
+
+  &lt;xsl:output method=&quot;xml&quot; version=&quot;1.0&quot; indent=&quot;yes&quot; encoding=&quot;UTF-8&quot; /&gt;
+
+  <span style="color:blue;">&lt;xsl:template match=&quot;/bib:metaextraction&quot;&gt;</span>
+    &lt;fo:root xmlns:fo=&quot;http://www.w3.org/1999/XSL/Format&quot;&gt;
+
+      &lt;!-- Set the document layout --&gt;
+      &lt;fo:layout-master-set&gt;
+        &lt;fo:simple-page-master master-name=&quot;A4&quot; page-width=&quot;210mm&quot; page-height=&quot;297mm&quot;
+            margin-top=&quot;1cm&quot; margin-bottom=&quot;1cm&quot; margin-left=&quot;1cm&quot; margin-right=&quot;1cm&quot;&gt;
+          &lt;fo:region-body margin=&quot;1cm&quot;/&gt;
+        &lt;/fo:simple-page-master&gt;
+      &lt;/fo:layout-master-set&gt;
+
+      &lt;!-- Main page sequence --&gt;
+      &lt;fo:page-sequence master-reference=&quot;A4&quot;&gt;
+        &lt;fo:flow flow-name=&quot;xsl-region-body&quot;&gt;
+          &lt;!-- Add a title --&gt;
+          &lt;fo:block font-size=&quot;250%&quot; font-weight=&quot;bold&quot; text-align=&quot;center&quot; space-after=&quot;1cm&quot;&gt;My First Bible&lt;/fo:block&gt;
+          &lt;!-- Add a table in the body region to list the sub-documents --&gt;
+          &lt;fo:table border=&quot;1pt solid #000000&quot; table-layout=&quot;fixed&quot; width=&quot;100%&quot;&gt;
+            &lt;fo:table-column column-width=&quot;60%&quot; /&gt;
+            &lt;fo:table-column column-width=&quot;40%&quot; /&gt;
+            &lt;fo:table-header font-weight=&quot;bold&quot;&gt;
+              &lt;fo:table-row border-bottom=&quot;1pt solid #000000&quot; &gt;
+                &lt;fo:table-cell border-right=&quot;0.5pt solid #000000&quot;&gt;
+                  &lt;fo:block margin=&quot;3.5pt&quot;&gt;Title&lt;/fo:block&gt;
+                &lt;/fo:table-cell&gt;
+                &lt;fo:table-cell&gt;
+                  &lt;fo:block margin=&quot;3.5pt&quot;&gt;Author&lt;/fo:block&gt;
+                &lt;/fo:table-cell&gt;
+              &lt;/fo:table-row&gt;
+            &lt;/fo:table-header&gt;
+            &lt;fo:table-body&gt;
+              &lt;!-- Iterates over the files to create the rows --&gt;
+              <span style="color:blue;">&lt;xsl:for-each select=&quot;bib:file&quot;&gt;
+                &lt;xsl:sort select=&quot;@name&quot;/&gt;</span>
+                &lt;fo:table-row border-bottom=&quot;0.5pt solid #000000&quot;&gt;
+                  &lt;fo:table-cell border-right=&quot;0.5pt solid #000000&quot;&gt;
+                    &lt;fo:block margin=&quot;3.5pt&quot;&gt;
+                      &lt;fo:block color=&quot;DodgerBlue&quot;&gt;
+                        &lt;fo:basic-link&gt;
+                          <span style="color:blue;">&lt;xsl:attribute name=&quot;external-destination&quot; select=&quot;fn:concat('pdf/',@name,'.pdf')&quot;/&gt;
+                          &lt;xsl:choose&gt;
+                            &lt;xsl:when test=&quot;bib:metadata[@name = 'title']/text()&quot;&gt;
+                              &lt;xsl:value-of select=&quot;bib:metadata[@name = 'title']/text()&quot;/&gt;
+                            &lt;/xsl:when&gt;
+                            &lt;!-- Defaults to the file name if the title is empty --&gt;
+                            &lt;xsl:otherwise&gt;
+                              &lt;xsl:value-of select=&quot;@name&quot;/&gt;
+                            &lt;/xsl:otherwise&gt;
+                          &lt;/xsl:choose&gt;</span>
+                        &lt;/fo:basic-link&gt;
+                      &lt;/fo:block&gt;
+                    &lt;/fo:block&gt;
+                  &lt;/fo:table-cell&gt;
+                  &lt;fo:table-cell&gt;
+                    &lt;fo:block margin=&quot;3.5pt&quot;&gt;
+                      <span style="color:blue;">&lt;xsl:value-of select=&quot;bib:metadata[@name = 'Author']/text()&quot;/&gt;</span>
+                    &lt;/fo:block&gt;
+                  &lt;/fo:table-cell&gt;
+                &lt;/fo:table-row&gt;
+              &lt;/xsl:for-each&gt;
+            &lt;/fo:table-body&gt;
+          &lt;/fo:table&gt;
+        &lt;/fo:flow&gt;
+      &lt;/fo:page-sequence&gt;
+    &lt;/fo:root&gt;
+  &lt;/xsl:template&gt;
+&lt;/xsl:stylesheet&gt;</pre>
+<p>
+	If you're not familiar with <a href="http://www.w3schools.com/xsl/" target="_blank">XSLT</a> and
+	<a href="http://www.w3schools.com/xslfo/" target="_blank">XSL-FO</a> (those are links to tutorials), don't be
+	impress by the size of the stylesheet, XSL-FO is quite verbose! But most of the content is static. For easier
+	understanding, the parts doing the actual processing have been highlighted in blue.
+</p>
+<p style="margin-bottom: 0;">
+	Below is explained what the stylesheet does:
+</p>
+<ol>
+	<li>Match the root element of <i>docMetadata.xml</i> (first line in blue),</li>
+	<li>Set the document layout, start the page flow, add a title, add the table where the sub-documents will be
+		listed, set its header (next big part in black),</li>
+	<li>Iterate over the file elements in <i>docMetadata.xml</i> (next two lines in blue),</li>
+	<li>Add a row per file element in the table with a cell that gives a link with the title or filename if the first is
+		empty (big part in blue) and another cell with the author (last line in blue).</li>
+</ol>
+
+<h3>Run the Script !</h3>
+<p>
+	Enough talking, it's now time to run the script, open a command prompt, set the current directory to the folder
+	referenced as <i>current working directory</i> from the start of this tutorial and type:
+</p>
+<blockquote><pre>bibant</pre></blockquote>
+<p>
+	This will execute the default script (<i>build.xml</i>) on the default target (<i>pack</i>).
+</p>
+<p>
+	You should now get a <i>bible.zip</i> archive as well as a <i>bible</i> folder. Open <i>index.pdf</i> in the <i>bible</i>
+	folder, click on a title and see the corresponding document converted to PDF.<br/>
+	That's it, you've successfully generated your first bible with BibAnt!
+</p>
+<p>
+	Or maybe not yet... If you get a <i>BUILD FAILED</i>, you can run again BibAnt but this time in debug mode:
+</p>
+<blockquote><pre>bibant -d</pre></blockquote>
+<p>
+	The exception making the build fail will then be displayed. Didn't you forget to add a <i>docs</i> folder with some
+	source Word documents inside?
+</p>
+</body>
+</html>

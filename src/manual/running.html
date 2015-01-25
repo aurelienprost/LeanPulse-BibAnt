@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+ Copyright (c) 2012 LeanPulse. All rights reserved.
+ 
+ Author: Aurélien PROST (a.prost@leanpulse.com)
+-->
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="ext/ant/stylesheets/style.css">
+<link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico">
+<title>Running LeanPulse BibAnt</title>
+</head>
+
+<body>
+
+<h1>Running LeanPulse BibAnt</h1>
+
+<p>
+	If you've installed BibAnt with the provided installer, running BibAnt from the command-line
+	is simple: just type <code>bibant</code>.
+</p>
+<p>
+	When no arguments are specified, BibAnt looks for a <code>build.xml</code> file in the current
+	directory and, if found, uses that file as the build file and runs the target specified in the
+	<code>default</code> attribute of the <code>&lt;project&gt;</code> tag. To make BibAnt use a
+	build file other than <code>build.xml</code>, use the command-line option
+	<nobr><code>-buildfile <i>file</i></code></nobr>, where <i>file</i> is the name of the build
+	file you want to use (or a directory containing a <code>build.xml</code> file).
+</p>
+<p>
+	You can also set <a href="ext/ant/using.html#properties">properties</a> on the command line.
+	This can be done with the <nobr><code>-D<i>property</i>=<i>value</i></code></nobr> option,
+	where <i>property</i> is the name of the property, and <i>value</i> is the value for that
+	property. If you specify a property that is also set in the build file (see the
+	<a href="ext/ant/Tasks/property.html">property</a> task), the value specified on the command
+	line will override the value specified in the build file. Defining properties on the command
+	line can also be used to pass in the value of environment variables; just pass
+	<nobr><code>-DMYVAR=%MYVAR%</code></nobr> to BibAnt. You can then access these variables inside
+	your build file as <code>${MYVAR}</code>. You can also access environment variables using the
+	<a href="ext/ant/Tasks/property.html"> property</a> task's <code>environment</code> attribute.
+</p>
+<p>
+	Options that affect the amount of logging output by BibAnt are: <nobr><code>-quiet</code></nobr>,
+	which instructs BibAnt to print less information to the console; <nobr><code>-verbose</code></nobr>,
+	which causes BibAnt to print additional information to the console; and <nobr><code>-debug</code></nobr>,
+	which causes BibAnt to print considerably more additional information.
+</p>
+<p>
+	It is also possible to specify one or more targets that should be executed. When omitted, the
+	target that is specified in the <code>default</code> attribute of the
+	<a href="ext/ant/using.html#projects"><code>project</code></a> tag is used.
+</p>
+<p>
+
+<h3><a name="options">Command-line Options Summary</a></h3>
+
+<pre>bibant [options] [target [target2 [target3] ...]]
+Options:
+  -buildfile &lt;file&gt;      use given buildfile
+    -file    &lt;file&gt;              ''
+    -f       &lt;file&gt;              ''
+  -D&lt;property&gt;=&lt;value&gt;   use value for given property
+  -propertyfile &lt;name&gt;   load all properties from file with -D
+                         properties taking precedence
+  -quiet, -q             be extra quiet
+  -verbose, -v           be extra verbose
+  -debug, -d             print debugging information
+  -logfile &lt;file&gt;        use given file for log
+    -l     &lt;file&gt;                ''
+  -keep-going, -k        execute all targets that do not depend
+                         on failed target(s)
+  -autoproxy             use the OS proxies
+  -version               print the version information and exit
+  -help, -h              print this message</pre>
+
+<h3>Examples</h3>
+
+<blockquote>
+	<pre>bibant</pre>
+</blockquote>
+<p>
+	runs BibAnt using the <code>build.xml</code> file in the current directory, on the default target.
+</p>
+<blockquote>
+	<pre>bibant -buildfile test.xml</pre>
+</blockquote>
+<p>
+	runs BibAnt using the <code>test.xml</code> file in the current directory, on the default target.
+</p>
+<blockquote>
+	<pre>bibant -buildfile test.xml dist</pre>
+</blockquote>
+<p>
+	runs BibAnt using the <code>test.xml</code> file in the current directory, on the target called
+	<code>dist</code>.
+</p>
+<blockquote>
+	<pre>bibant -buildfile test.xml -Dbible.ver=1.0</pre>
+</blockquote>
+<p>
+	runs BibAnt using the <code>test.xml</code> file in the current directory, on the target called
+	<code>dist</code>, setting the <code>bible.ver</code> property to the value <code>1.0</code>.
+</p>
+
+<h3>return code</h3>
+<p>
+	A successful build returns 0, failed builds return other values.
+</p>
+
+</body>
+</html>

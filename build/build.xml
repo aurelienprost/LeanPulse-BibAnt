@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ This Ant project implements targets to build and test BibAnt.
+ 
+ *************************************************************************************************
+ *************************           !!!   PREREQUISITES   !!!           *************************
+ *************************************************************************************************
+ Required software:
+ 	- NSIS (http://nsis.sourceforge.net/) to generate the Windows installer.
+ 		The executbale "makensis" must be in your paths.
+ *************************************************************************************************
+ 
+ Copyright (c) 2014 LeanPulse. All rights reserved.
+ 
+ Author: Aurélien PROST (a.prost@leanpulse.com)
+-->
+<project name="BibAnt" basedir=".." default="setup">
+	
+	<!-- Load build properties. -->
+	<property file="${basedir}/build/build.properties"/>
+	
+	<!-- Define common directories. -->
+	<property name="src.dir" location="${basedir}/src" />
+	<property name="bin.dir" location="${basedir}/bin" />
+	<property name="test.dir" location="${basedir}/test" />
+	<property name="dist.dir" location="${basedir}/#dist" />
+	<property name="dist.app.dir" location="${dist.dir}/app" />
+	
+	<!-- Set dates and tool version in java sources. -->
+	<target name="set-ver-java">
+		<replaceregexp file="${src.dir}/java/com/leanpulse/bibant/Launcher.java"
+			match='\/\*@BIBANTVER@\*\/".*"\/\*@BIBANTVER@\*\/' replace='/*@BIBANTVER@*/"${bibantver}"/*@BIBANTVER@*/' />
+		<replaceregexp file="${src.dir}/java/com/leanpulse/bibant/Launcher.java"
+			match='\/\*@BIBANTDATE@\*\/".*"\/\*@BIBANTDATE@\*\/' replace='/*@BIBANTDATE@*/"${bibantdate}"/*@BIBANTDATE@*/' />
+		<eclipse.refreshLocal resource="BibAnt/src" depth="infinite"/>
+	</target>
+	
+	<!-- Clean the binaries. -->
+	<target name="clean-bin" description="Clean the binaries">
+		<eclipse.incrementalBuild project="BibAnt" kind="clean"/>
+	</target>
+	
+	<!-- Clean the distribution directory. -->
+	<target name="clean-dist" description="Clean the distribution directory">
+		<delete dir="${dist.dir}"/>
+	</target>
+	
+	<!-- Copy and build all sources files to the distribution directory. -->
+	<target name="dist" depends="set-ver-java,clean-dist">
+		<copy todir="${dist.app.dir}">
+			<fileset dir="${src.dir}" excludes="docs/,java/"/>
+		</copy>
+		<replaceregexp file="${dist.app.dir}/manual/cover.html" match="@BIBANTVER@" replace="${bibantver}" />
+	</target>
+	
+	<!-- Build the BibAnt installer. -->
+	<target name="setup" depends="dist" description="Build the BibAnt installer">
+		<exec executable="makensis">
+			<arg value="/DVERSION=${bibantver}"/>
+			<arg value="/DCUSTOMER=${customer}"/>
+			<arg value="${basedir}/build/setup.nsi"/>
+		</exec>
+	</target>
+	
+</project>

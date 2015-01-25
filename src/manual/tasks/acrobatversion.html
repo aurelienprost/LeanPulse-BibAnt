@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+ Copyright (c) 2012 LeanPulse. All rights reserved.
+ 
+ Author: Aurélien PROST (a.prost@leanpulse.com)
+-->
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../ext/ant/stylesheets/style.css">
+<link rel="shortcut icon" type="image/x-icon" href="../images/favicon.ico">
+<title>AcrobatVersion Task</title>
+</head>
+
+<body>
+
+	<h2>
+		<a name="acrobatversion">AcrobatVersion</a>
+	</h2>
+	
+	<h3>Description</h3>
+	
+	<p>
+		Stores the Adobe Acrobat version installed on the computer (when used as task) or checks for a specific Acrobat
+		version (when used as condition).
+	</p>
+	<p>
+		<strong>Note:</strong> This task will fail if Adobe Acrobat isn't installed on the local computer.
+	</p>
+	
+	<h3>Parameters</h3>
+	
+	<table border="1" cellpadding="2" cellspacing="0">
+		<tr>
+			<td valign="top"><b>Attribute</b></td>
+    		<td valign="top"><b>Description</b></td>
+    		<td align="center" valign="top"><b>Required (Task)</b></td>
+    		<td align="center" valign="top"><b>Required (Condition)</b></td>
+		</tr>
+		<tr>
+			<td valign="top">atleast</td>
+			<td valign="top">The version that Acrobat is at least. The format is <tt>major.minor</tt>.</td>
+			<td valign="top" align="center">No</td>
+			<td valign="top" rowspan="2" align="center">One of these.</td>
+		</tr>
+		<tr>
+			<td valign="top">exactly</td>
+			<td valign="top">The version that Acrobat is exactly. The format is <tt>major.minor</tt>.</td>
+			<td valign="top" align="center">No</td>
+		</tr>
+		<tr>
+			<td valign="top">property</td>
+			<td valign="top">The name of the property to set.</td>
+			<td valign="top" align="center">Yes</td>
+			<td valign="top" align="center">No (ignored)</td>
+		</tr>
+	</table>
+
+	<h3>Examples</h3>
+	
+	<p><b>Stores the installed Adobe Acrobat version in the property <i>acrover</i>.</b></p>
+	<pre>&lt;acrobatversion property=&quot;acrover&quot;/&gt;</pre>
+
+	<p><b>Stores the Adobe Acrobat version in the property <i>acrover</i> if the Acrobat version is 10.0 or higher.
+	Otherwise the property remains unset.</b></p>
+	<pre>&lt;acrobatversion property=&quot;acrover&quot; atleast=&quot;10.0&quot;/&gt;</pre>
+
+	<p><b>Sets the property <i>acrobat-is-exact-10</i> if Acrobat 10.0 is installed. Neither 9.0 nor 10.1 would match.</b></p>
+	<pre>&lt;acrobatversion property=&quot;acrobat-is-exact-10&quot; exactly=&quot;10.0&quot;/&gt;</pre>
+
+	<p><b>Sets <i>Acrobat10isInstalled</i> if Acrobat 10.0 is installed.</b></p>
+	<pre>&lt;condition property=&quot;Acrobat10isInstalled&quot;&gt;
+  &lt;acrobatversion exactly=&quot;10.0&quot;/&gt;
+&lt;/condition&gt;</pre>
+
+</body>
+</html>

@@ -1,0 +1,257 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+ Copyright (c) 2013 LeanPulse. All rights reserved.
+ 
+ Author: Aurélien PROST (a.prost@leanpulse.com)
+-->
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../ext/ant/stylesheets/style.css">
+<link rel="shortcut icon" type="image/x-icon" href="../images/favicon.ico">
+<title>WordMacro Task</title>
+</head>
+
+<body>
+
+	<h2>
+		<a name="wordmacro">WordMacro</a>
+	</h2>
+	
+	<h3>Description</h3>
+	
+	<p>
+		Executes a Visual Basic macro on a MS Word document or a collection of documents.
+		This task will automatically open the documents, execute the provided VB code on
+		each of them as if it was included in a macro in Word and finally save back the
+		files.<br/>
+	</p>
+	<p>
+		In the case of separated source and destination files, the macro will by default
+		only be executed if the source is newer than the destination, or when the destination
+		does not exist. However, you can explicitly overwrite files with the
+		<code>force</code> attribute.
+	</p>
+	<p>
+		<strong>Important Notes:</strong>
+		<ol>
+			<li><p>
+				<strong>Programmatic Access:</strong> The task requires programmatic
+				access to Office VBA project and you have to ensure your Word installation
+				is correctly configured to enable this. Otherwise, you may face	the following
+				error message: <code>Run-time error '6068': Programmatic Access to Visual Basic Project is not trusted</code>.<br/>
+				Please refer to the <a href="http://support.microsoft.com/kb/282830" target="_blank">article #282830</a>
+				from Microsoft to learn how to enable the programmatic access on your system.
+			</p></li>
+			<li><p>
+				<strong>Error Handling:</strong> The code inserted in the task is compiled
+				by Word just before its execution and if a <strong>compile error</strong>
+				occurs, Word will hang and highlight the problem in its Visual Basic Editor,
+				making the entire build process pause until the user manually closes the
+				editor. There is no way to prevent this	behaviour so please ensure your code
+				is semantically correct before running the task. An easy way to perform such
+				a validation is to create a macro directly in Word, paste your code there
+				and try to execute it.<br/>
+				On the contrary, <strong>runtime errors</strong> (errors that occur during the
+				execution of the macro) are fully handled by the task. You can even choose to
+				stop or continue the build when one occurs, depending on the value of the
+				<code>failonerror</code> attribute.
+			</p></li>
+		</ol>
+	</p>
+	
+	<h3>Parameters</h3>
+	
+	<table border="1" cellpadding="2" cellspacing="0">
+		<tr>
+			<td valign="top"><b>Attribute</b></td>
+			<td valign="top"><b>Description</b></td>
+			<td align="center" valign="top"><b>Required</b></td>
+		</tr>
+		<tr>
+			<td valign="top">file</td>
+			<td valign="top">The Word document on which the macro will be run.</td>
+			<td valign="top" align="center">Yes, unless a nested resource collection element is
+				used.</td>
+		</tr>
+		<tr>
+			<td valign="top">vbfiles</td>
+			<td valign="top">The VB files (*.bas, *.frm, *.cls) implementing the macro to be executed.<br/>
+				This is a list of file names separated by whitespace, or by commas.</td>
+			<td valign="top" align="center" rowspan="2">Yes, unless the VB code is directly
+				included in a character section within this element. </td>
+		</tr>
+		<tr>
+			<td valign="top">macroname</td>
+			<td valign="top">The name of the macro to be executed.</td>
+		</tr>
+		<tr>
+			<td valign="top">macroargs</td>
+			<td valign="top">The arguments to be passed to the macro.<br/>
+				Arguments must be passed as they would be if the macro was called from Visual
+				Basic i.e. separated by commas and strings double-quoted.</td>
+			<td valign="top" align="center">No, unless the macro requires some arguments to be
+				passed. </td>
+		</tr>
+		<tr>
+			<td valign="top">returnproperty</td>
+			<td valign="top">The name of the property in which to return the result of the macro.<br/>
+				The only return type allowed is <code>String</code>. In the case of a function, it must
+				be declared to return <code>As String</code>. If the macro code is directly defined in
+				the task, a variable named <code>result</code> can be used to store the value to return.</td>
+			<td valign="top" align="center">No</td>
+		</tr>
+		<tr>
+			<td valign="top">tofile</td>
+			<td valign="top">The file in which the resulting document will be saved.</td>
+			<td valign="top" align="center" rowspan="2">With the <code>file</code>
+				attribute, either <code>tofile</code> or <code>todir</code> can be
+				used.<br />
+				With nested resource collection elements, if the number
+				of included resources is greater than 1, or if only the <code>dir</code>
+				attribute is specified in the <code>&lt;fileset&gt;</code>, or if
+				the <code>file</code> attribute is also specified, then only <code>todir</code>
+				is allowed.<br/>
+				If both <code>tofile</code> and <code>todir</code> are omitted, the document(s) will
+				be saved back in the source file(s).
+			</td>
+		</tr>
+		<tr>
+			<td valign="top">todir</td>
+			<td valign="top">The directory where the resulting document(s) will be saved.</td>
+		</tr>
+		<tr>
+			<td valign="top">interactive</td>
+			<td valign="top">If true, the application will be visible while executing the macro.</td>
+			<td valign="top" align="center">No; defaults to false.</td>
+		</tr>
+		<tr>
+			<td valign="top">force</td>
+			<td valign="top">Recreate target files, even if they are newer than their
+				corresponding source files.</td>
+			<td valign="top" align="center">No; defaults to false.</td>
+		</tr>
+		<tr>
+			<td valign="top">preservelastmodified</td>
+			<td valign="top">Give the destination document(s) the same last modified
+				time as the original source file(s).</td>
+			<td valign="top" align="center">No; defaults to false.</td>
+		</tr>
+		<tr>
+			<td valign="top">failonerror</td>
+			<td valign="top">If false, log a warning message, but do not
+				stop the build, when the source document does not exist or one of the
+				nested filesets points to a directory that doesn't exist or an error
+				occurs while running the macro (Only runtime errors from Word are handled,
+				please report to important note #2 above for more information).				
+			</td>
+			<td valign="top" align="center">No; defaults to true.</td>
+		</tr>
+	</table>
+	
+	<h3>Parameters specified as nested elements</h3>
+
+	<h4>fileset or any other resource collection</h4>
+	<p>
+		<a href="../ext/ant/Types/resources.html#collection">Resource Collection</a>s
+		are used to select groups of Word documents to process. To define the directory
+		where the resulting documents will be saved, the <code>todir</code> attribute
+		can be set.	If omitted, the documents will be saved back in the source files.
+	</p>
+
+	<h4>mapper</h4>
+	<p>
+		You can define filename transformations by using a nested
+		<a href="../ext/ant/Types/mapper.html">mapper</a> element. The default mapper
+		used by	<code>&lt;wordmacro&gt;</code> is an
+		<a href="../ext/ant/Types/mapper.html#identity-mapper">identity mapper</a>.
+	</p>
+	<p>
+		Note that the source name handed to the mapper depends on the resource
+		collection you use. If you use <code>&lt;fileset&gt;</code>
+		or any other collection that provides a base directory, the name
+		passed to the mapper will be a relative filename, relative to the base
+		directory. In any other case the absolute filename of the source will
+		be used.
+	</p>
+
+	<h3>Examples</h3>
+	
+	<p>The following example updates all the fields in a single Word document.</p>
+	<pre>&lt;wordmacro file=&quot;document.doc&quot;&gt;
+  Selection.WholeStory 
+  Selection.Fields.Update 
+&lt;/wordmacro&gt;</pre>
+	
+	<p>
+		The snippet below shows how to perform a find &amp; replace on a set of
+		Word documents and save the modified files to an output directory, appending
+		<code>-mod</code> to the file names on the fly.<br/>
+		It also demonstrates how BibAnt properties can be directly used in the VB code. 
+	</p>
+	<pre>&lt;property name=&quot;search.text&quot; value=&quot;searched&quot;/&gt;
+&lt;property name=&quot;replace.text&quot; value=&quot;replaced&quot;/&gt;
+
+&lt;wordmacro todir=&quot;out&quot;&gt;
+  &lt;fileset dir=&quot;.&quot;&gt;
+    &lt;include name=&quot;*.doc&quot;/&gt;
+  &lt;/fileset&gt;
+  &lt;globmapper from=&quot;*.doc&quot; to=&quot;*-mod.doc&quot;/&gt;
+  &lt;![CDATA[
+    Selection.Find.ClearFormatting
+    Selection.Find.Replacement.ClearFormatting
+    With Selection.Find
+      .Text = &quot;${search.text}&quot;
+      .Replacement.Text = &quot;${replace.text}&quot;
+      .Forward = True
+      .Wrap = wdFindContinue
+      .Format = False
+      .MatchCase = False
+      .MatchWholeWord = False
+      .MatchWildcards = False
+      .MatchSoundsLike = False
+      .MatchAllWordForms = False
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+  ]]&gt;
+&lt;/wordmacro&gt;</pre>
+
+	<p>
+		The following code does the same as the previous example but the macro is now
+		implemented in a separated BAS file.<br/>
+		BibAnt properties must then be passed as arguments of the macro. 
+	</p>
+	<pre>&lt;property name=&quot;search.text&quot; value=&quot;searched&quot;/&gt;
+&lt;property name=&quot;replace.text&quot; value=&quot;replaced&quot;/&gt;
+
+&lt;wordmacro vbfiles=&quot;SearchAndReplace.bas&quot; macroname=&quot;ReplaceAll&quot; macroargs='&quot;${search.text}&quot;,&quot;${replace.text}&quot;' todir=&quot;out&quot;&gt;
+  &lt;fileset dir=&quot;.&quot;&gt;
+    &lt;include name=&quot;*.doc&quot;/&gt;
+  &lt;/fileset&gt;
+  &lt;globmapper from=&quot;*.doc&quot; to=&quot;*-mod.doc&quot;/&gt;
+&lt;/wordmacro&gt;</pre>
+
+	<p>Below is the content of the <code>SearchAndReplace.bas</code> file:</p>
+	
+	<pre>Attribute VB_Name = "SearchAndReplace"
+Sub ReplaceAll(search, replace)
+    Selection.Find.ClearFormatting
+    Selection.Find.Replacement.ClearFormatting
+    With Selection.Find
+        .Text = search
+        .Replacement.Text = replace
+        .Forward = True
+        .Wrap = wdFindContinue
+        .Format = False
+        .MatchCase = False
+        .MatchWholeWord = False
+        .MatchWildcards = False
+        .MatchSoundsLike = False
+        .MatchAllWordForms = False
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+End Sub</pre>
+
+</body>
+</html>

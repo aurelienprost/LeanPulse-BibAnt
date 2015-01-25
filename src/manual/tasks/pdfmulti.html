@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+ Copyright (c) 2012 LeanPulse. All rights reserved.
+ 
+ Author: Aurélien PROST (a.prost@leanpulse.com)
+-->
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../ext/ant/stylesheets/style.css">
+<link rel="shortcut icon" type="image/x-icon" href="../images/favicon.ico">
+<title>PdfMulti Task</title>
+</head>
+
+<body>
+
+	<h2>
+		<a name="pdfmulti">PdfMulti</a>
+	</h2>
+	
+	<h3>Description</h3>
+	
+	<p>
+		Performs multiple operations on a PDF file or a set of PDF files.
+	</p>
+	<p>
+		The operations are defined as nested elements corresponding to the standalone PDF processing tasks:
+		<ul>
+			<li><code>&lt;pdfdecrypt&gt;</code> (<a href="pdfdecrypt.html">PdfDecrypt</a>),</li>
+			<li><code>&lt;pdfencrypt&gt;</code> (<a href="pdfencrypt.html">PdfEncrypt</a>),</li>
+			<li><code>&lt;pdfreplaceregexp&gt;</code> (<a href="pdfreplaceregexp.html">PdfReplaceRegExp</a>),</li>
+			<li><code>&lt;pdfsetopenaction&gt;</code> (<a href="pdfsetopenaction.html">PdfSetOpenAction</a>),</li>
+			<li><code>&lt;pdfsetsearchindex&gt;</code> (<a href="pdfsetsearchindex.html">PdfSetSearchIndex</a>).</li>
+		</ul>
+	</p>
+	<p>
+		The attributes for the nested elements are the same as for the standalone tasks, except <code>file</code>,
+		<code>preservelastmodified</code> and <code>failonerror</code> which are ignored. Please report to the
+		corresponding tasks documentation to learn how to define the nested elements.
+	</p>
+	<p>
+		<strong>Note:</strong> If several modifications must be performed on the same document(s), execute
+		<code>&lt;pdfmulti&gt;</code> will be always faster than individual processing tasks because the latest will
+		require to load and save the file(s) for each modification.
+	</p>
+	
+	<h3>Parameters</h3>
+	
+	<table border="1" cellpadding="2" cellspacing="0">
+		<tr>
+			<td valign="top"><b>Attribute</b></td>
+			<td valign="top"><b>Description</b></td>
+			<td align="center" valign="top"><b>Required</b></td>
+		</tr>
+		<tr>
+			<td valign="top">file</td>
+			<td valign="top">The file to process.</td>
+			<td valign="top" align="center">Yes, unless a nested resource collection element is used.</td>
+		</tr>
+		<tr>
+			<td valign="top">preservelastmodified</td>
+			<td valign="top">Preserve the last modified time of PDF files.</td>
+			<td valign="top" align="center">No; defaults to false.</td>
+		</tr>
+		<tr>
+			<td valign="top">failonerror</td>
+			<td valign="top">If false, log a warning message, but do not stop
+				the build, when the PDF file to process does not exist or an error
+				occurs while processing.</td>
+			<td valign="top" align="center">No; defaults to true.</td>
+		</tr>
+	</table>
+	
+	<h3>Parameters specified as nested elements</h3>
+
+	<h4>fileset or any other resource collection</h4>
+	<p>
+		<a href="../ext/ant/Types/resources.html#collection">Resource Collection</a>s
+		are used to select groups of PDFs to decrypt.
+	</p>
+	
+	<h4>PDF processing element</h4>
+	<p>
+		Nested element with the same name as the corresponding PDF processing task.
+		To define their attributes, please report to the documentation of the corresponding tasks.
+	</p>
+
+	<h3>Example</h3>
+	
+	<p><b>Set the open action, the approver name in the first page and remove the DRAFT watermark in all the pages of a document</b></p>
+	<pre>&lt;pdfmulti file=&quot;myfile.pdf&quot;;&gt;
+  &lt;pdfsetopenaction;&gt;
+    &lt;![CDATA[app.alert('Hello World!');]];&gt;
+  &lt;/pdfsetopenaction;&gt;
+  &lt;pdfreplaceregexp countperpage=&quot;1&quot;;&gt;
+    &lt;repentry match=&quot;@APPROVER_NAME@&quot; replace=&quot;Aurélien PROST&quot; endpage=&quot;1&quot;/;&gt;
+    &lt;repentry match=&quot;DRAFT&quot; replace=&quot;&quot;/;&gt;
+  &lt;/pdfreplaceregexp;&gt;
+&lt;/pdfmulti;&gt;</pre>
+
+</body>
+</html>

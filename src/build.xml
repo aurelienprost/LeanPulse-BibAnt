@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ This BibAnt project implements the bible generation process as explained in the "Using LeanPulse BibAnt" tutorial.
+ 
+ Compared to the tutorial, this script adds a user interface to let the user select which directory to use as the
+ working directory (step 0 below).
+ 
+ Copyright (c) 2012 LeanPulse. All rights reserved.
+ Author: Aurélien PROST (a.prost@leanpulse.com)
+-->
+<project name="MyBibAntProject" basedir="." default="pack">
+
+	<!-- Set global properties for this build -->
+	<property name="style.file" location="bible.xsl"/>
+	
+	<target name="init">
+		<!-- 0. User interface to let the user select the working directory -->
+		<userinterface title="Working directory selection">
+			<label>
+				<![CDATA[<html>
+					<h4>Select the working directory that will be used to build the bible.</h4>
+					<p>The bible generation process executed here is explained in the <i>Using LeanPulse BibAnt</i> tutorial from the BibAnt manual.</p>
+					<p>The working directory selected below must contain a <b>docs</b> folder with some Word documents to be compiled.</p>
+				</html>]]>
+			</label>
+			<fileselection text="Work Dir:" property="work.dir" tooltip="The working directory" default="${user.home}\BibAnt"/>
+		</userinterface>
+		<property name="docs.dir" location="${work.dir}/docs"/>
+		<property name="meta.file" location="${work.dir}/docMetadata.xml"/>
+		<property name="bible.dir" location="${work.dir}/bible"/>
+		<property name="index.file" location="${bible.dir}/index.pdf"/>
+		<property name="pdf.dir" location="${bible.dir}/pdf"/>
+		<property name="zip.file" location="${work.dir}/bible.zip"/>
+		
+		<!-- 1. Create the bible directory structure -->
+		<mkdir dir="${pdf.dir}"/>
+	</target>
+	
+	<target name="createIndex" depends="init">
+		<!-- 2.a Extract the metadata (title, author, etc.) from the Word documents -->
+		<extractmetadata metafile="${meta.file}">
+			<fileset dir="${docs.dir}">
+				<include name="*.doc"/>
+				<include name="*.docx"/>
+			</fileset>
+		</extractmetadata>
+		<!-- 2.b Render those metadata to PDF -->
+		<xml2pdf xmlfile="${meta.file}" xsltfile="${style.file}" outfile="${index.file}"/>
+	</target>
+	
+	<target name="convertDocs" depends="init">
+		<!-- 3. Convert the word documents to PDF -->
+		<word2pdf todir="${pdf.dir}">
+			<fileset dir="${docs.dir}">
+				<include name="*.doc"/>
+				<include name="*.docx"/>
+			</fileset>
+		</word2pdf>
+	</target>
+	
+	<target name="pack" depends="createIndex,convertDocs">
+		<!-- Bonus: pack the bible in a ZIP ! -->
+		<zip basedir="${bible.dir}" destfile="${zip.file}"/>
+	</target>
+	
+</project>

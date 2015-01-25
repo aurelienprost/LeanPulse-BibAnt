@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+ Copyright (c) 2012 LeanPulse. All rights reserved.
+ 
+ Author: Aurélien PROST (a.prost@leanpulse.com)
+-->
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../ext/ant/stylesheets/style.css">
+<link rel="shortcut icon" type="image/x-icon" href="../images/favicon.ico">
+<title>PdfDecrypt Task</title>
+</head>
+
+<body>
+
+	<h2>
+		<a name="pdfdecrypt">PdfDecrypt</a>
+	</h2>
+	
+	<h3>Description</h3>
+	
+	<p>
+		Decrypts a PDF file or a set of PDF files.
+	</p>
+	
+	<h3>Parameters</h3>
+	
+	<table border="1" cellpadding="2" cellspacing="0">
+		<tr>
+			<td valign="top"><b>Attribute</b></td>
+			<td valign="top"><b>Description</b></td>
+			<td align="center" valign="top"><b>Required</b></td>
+		</tr>
+		<tr>
+			<td valign="top">file</td>
+			<td valign="top">The file to decrypt.</td>
+			<td valign="top" align="center">Yes, unless a nested resource collection element is used.</td>
+		</tr>
+		<tr>
+			<td valign="top">password</td>
+			<td valign="top">The owner password to the PDF or for the certificate.</td>
+			<td valign="top" align="center">Yes</td>
+		</tr>
+		<tr>
+			<td valign="top">keystore</td>
+			<td valign="top">Keystore that holds certificate to decrypt the document.</td>
+			<td valign="top" align="center">No; unless the document is encrypted with a certificate.</td>
+		</tr>
+		<tr>
+			<td valign="top">alias</td>
+			<td valign="top">The alias to the certificate in the keystore.</td>
+			<td valign="top" align="center">No; unless the keystore contains more than one certificate.</td>
+		</tr>
+		<tr>
+			<td valign="top">preservelastmodified</td>
+			<td valign="top">Preserve the last modified time of PDF files.</td>
+			<td valign="top" align="center">No; defaults to false.</td>
+		</tr>
+		<tr>
+			<td valign="top">failonerror</td>
+			<td valign="top">If false, log a warning message, but do not stop
+				the build, when the PDF file to decrypt does not exist or an error
+				occurs while decrypting.</td>
+			<td valign="top" align="center">No; defaults to true.</td>
+		</tr>
+	</table>
+	
+	<h3>Parameters specified as nested elements</h3>
+
+	<h4>fileset or any other resource collection</h4>
+	<p>
+		<a href="../ext/ant/Types/resources.html#collection">Resource Collection</a>s
+		are used to select groups of PDFs to decrypt.
+	</p>
+
+	<h3>Examples</h3>
+	
+	<p><b>Decrypt a single PDF</b></p>
+	<pre>&lt;pdfdecrypt file=&quot;myfile.pdf&quot; password=&quot;pass&quot;/&gt;</pre>
+	
+	<p><b>Decrypt all PDFs in a directory and its sub-directories</b></p>
+	<pre>&lt;pdfdecrypt password=&quot;pass&quot;&gt;
+  &lt;fileset dir=&quot;pdf_dir&quot; includes=&quot;**/*.pdf&quot;/&gt;
+&lt;/pdfdecrypt&gt;</pre>
+
+</body>
+</html>

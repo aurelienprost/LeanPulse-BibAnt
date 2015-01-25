@@ -1,0 +1,321 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+ Copyright (c) 2012 LeanPulse. All rights reserved.
+ 
+ Author: Aurélien PROST (a.prost@leanpulse.com)
+-->
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../ext/ant/stylesheets/style.css">
+<link rel="shortcut icon" type="image/x-icon" href="../images/favicon.ico">
+<title>UserInterface Task</title>
+</head>
+
+<body>
+
+	<h2>
+		<a name="userinterface">UserInterface</a>
+	</h2>
+	
+	<h3>Description</h3>
+	
+	<p>
+		Creates simple user interfaces to display a message or request an input from the user.
+	</p>
+	<p>
+		User interfaces can include labels, text fields, file/directory	selections and check boxes.
+		The input elements are defined by the nested elements of this task. Each input element defines
+		an associated property that is set to the element value when the user interface is validated.
+	</p>
+	<p>
+		The user will be able to continue the build only when inputs of all elements are considered as
+		valid. The user can otherwise choose to abort the build.
+	</p>
+	<p>
+		A <code>file</code> attribute can be set to load the properties from / save the properties to
+		before / after the user interface is displayed. This enables to automatically retrieve values
+		entered by the user in subsequent builds.
+	</p>
+	
+	<h3>Parameters</h3>
+	
+	<table border="1" cellpadding="2" cellspacing="0">
+		<tr>
+			<td valign="top"><b>Attribute</b></td>
+			<td valign="top"><b>Description</b></td>
+			<td align="center" valign="top"><b>Required</b></td>
+		</tr>
+		<tr>
+			<td valign="top">title</td>
+			<td valign="top">The title of the window.</td>
+			<td valign="top" align="center">No</td>
+		</tr>
+		<tr>
+			<td valign="top">file</td>
+			<td valign="top">The properties file where to read/save the properties.</td>
+			<td valign="top" align="center">No</td>
+		</tr>
+	</table>
+	
+	<h3>Parameters specified as nested elements</h3>
+
+	<h4>Input elements</h4>
+	<p>
+		Nested elements allow several (input) interfaces to be specified. The order of the nested elements
+		defines the order of the graphical elements (from top to bottom) in the user interface.
+	</p>
+	
+	<ul><li><b><code>&lt;label&gt;</code> element</b></li></ul>
+	<p>
+		Displays some text with an optional icon on the left.<br/>
+		Advanced styling can be obtained by using HTML tags. The text must then start and end with an
+		&lt;html&gt; tag.
+	</p>
+	<h5>Parameters</h5>
+	<table border="1" cellpadding="2" cellspacing="0">
+		<tr>
+			<td valign="top"><b>Attribute</b></td>
+			<td valign="top"><b>Description</b></td>
+			<td align="center" valign="top"><b>Required</b></td>
+		</tr>
+		<tr>
+			<td valign="top">text</td>
+			<td valign="top">The text to display.</td>
+			<td align="center" valign="top">Yes,</br>
+				unless text is included in a character section within this element.</td>
+		</tr>
+		<tr>
+			<td valign="top">icon</td>
+			<td valign="top">The icon to display. This can have one of four values ("question", "information", "warning" or "error").</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+	</table>
+	
+	<ul><li><b><code>&lt;checkbox&gt;</code> element</b></li></ul>
+	<p>
+		Displays a check box.
+	</p>
+	<h5>Parameters</h5>
+	<table border="1" cellpadding="2" cellspacing="0">
+		<tr>
+			<td valign="top"><b>Attribute</b></td>
+			<td valign="top"><b>Description</b></td>
+			<td align="center" valign="top"><b>Required</b></td>
+		</tr>
+		<tr>
+			<td valign="top">text</td>
+			<td valign="top">The text of the check box.</td>
+			<td align="center" valign="top">Yes,</br>
+				unless text is included in a character section within this element.</td>
+		</tr>
+		<tr>
+			<td valign="top">property</td>
+			<td valign="top">The name of the property that will be set to the value of the check box.</td>
+			<td align="center" valign="top">Yes</td>
+		</tr>
+		<tr>
+			<td valign="top">default</td>
+			<td valign="top">A default value to initialize the check box to (only if the property wasn't loaded from the properties file).</td>
+			<td align="center" valign="top">No; defaults to false.</td>
+		</tr>
+	</table>
+	
+	<ul><li><b><code>&lt;buttongroup&gt;</code> element</b></li></ul>
+	<p>
+		Defines a button group. The button group element manages the selected/unselected state for a set of radio buttons. For the group, it
+		guarantees that only one button can be selected at a time.<br/>
+		A button group is relevant only with <code>&lt;radiobutton&gt;</code> children.
+	</p>
+	<h5>Parameters</h5>
+	<table border="1" cellpadding="2" cellspacing="0">
+		<tr>
+			<td valign="top"><b>Attribute</b></td>
+			<td valign="top"><b>Description</b></td>
+			<td align="center" valign="top"><b>Required</b></td>
+		</tr>
+		<tr>
+			<td valign="top">property</td>
+			<td valign="top">
+				The name of the property that will be set to the index of the selected radio button.<br/>
+				The selection index starts from 0 and identifies children radio button from top to bottom.
+			</td>
+			<td align="center" valign="top">Yes</td>
+		</tr>
+		<tr>
+			<td valign="top">default</td>
+			<td valign="top">A default value to initialize the selection to (only if the property wasn't loaded from the properties file).</td>
+			<td align="center" valign="top">No; defaults to 0 (first radio button selected).</td>
+		</tr>
+	</table>
+	
+	<ul><li><b><code>&lt;radiobutton&gt;</code> element</b></li></ul>
+	<p>
+		Displays a radio button. Radio buttons can be displayed on their own or managed inside a <code>&lt;buttongroup&gt;</code> to ensure
+		only one button is selected at a time.
+	</p>
+	<h5>Parameters</h5>
+	<table border="1" cellpadding="2" cellspacing="0">
+		<tr>
+			<td valign="top"><b>Attribute</b></td>
+			<td valign="top"><b>Description</b></td>
+			<td align="center" valign="top"><b>Required</b></td>
+		</tr>
+		<tr>
+			<td valign="top">text</td>
+			<td valign="top">The text of the radio button.</td>
+			<td align="center" valign="top">Yes,</br>
+				unless text is included in a character section within this element.</td>
+		</tr>
+		<tr>
+			<td valign="top">property</td>
+			<td valign="top">The name of the property that will be set to the value of the radio button.</td>
+			<td align="center" valign="top">Only required if not part of a button group.</td>
+		</tr>
+		<tr>
+			<td valign="top">default</td>
+			<td valign="top">A default value to initialize the radio button to (only if the property wasn't loaded from the properties file).</td>
+			<td align="center" valign="top">No; defaults to false and ignored if part of a button group.</td>
+		</tr>
+	</table>
+	
+	<ul><li><b><code>&lt;textfield&gt;</code> element</b></li></ul>
+	<p>
+		Displays a text field with a label on the left.
+	</p>
+	<h5>Parameters</h5>
+	<table border="1" cellpadding="2" cellspacing="0">
+		<tr>
+			<td valign="top"><b>Attribute</b></td>
+			<td valign="top"><b>Description</b></td>
+			<td align="center" valign="top"><b>Required</b></td>
+		</tr>
+		<tr>
+			<td valign="top">text</td>
+			<td valign="top">The text of the label.</td>
+			<td align="center" valign="top">Yes</td>
+		</tr>
+		<tr>
+			<td valign="top">property</td>
+			<td valign="top">The name of the property that will be set to the value of the text field.</td>
+			<td align="center" valign="top">Yes</td>
+		</tr>
+		<tr>
+			<td valign="top">allowempty</td>
+			<td valign="top">Allow empty value.</br>
+				<i>Note:</i> If the value is empty, the property won't be set.</td>
+			<td align="center" valign="top">No; defaults to false.</td>
+		</tr>
+		<tr>
+			<td valign="top">default</td>
+			<td valign="top">A default value to initialize the text field to (only if the property wasn't loaded from the properties file).</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">tooltip</td>
+			<td valign="top">The text to display when the cursor lingers over the component.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">icon</td>
+			<td valign="top">The icon of the label. This can have one of four values ("question", "information", "warning" or "error").</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+	</table>
+	
+	<ul><li><b><code>&lt;passwordfield&gt;</code> element</b></li></ul>
+	<p>
+		Displays a password field with a label on the left.
+	</p>
+	<h5>Parameters</h5>
+	<table border="1" cellpadding="2" cellspacing="0">
+		<tr>
+			<td valign="top"><b>Attribute</b></td>
+			<td valign="top"><b>Description</b></td>
+			<td align="center" valign="top"><b>Required</b></td>
+		</tr>
+		<tr>
+			<td valign="top">text</td>
+			<td valign="top">The text of the label.</td>
+			<td align="center" valign="top">Yes</td>
+		</tr>
+		<tr>
+			<td valign="top">property</td>
+			<td valign="top">The name of the property that will be set to the value of the password.</td>
+			<td align="center" valign="top">Yes</td>
+		</tr>
+		<tr>
+			<td valign="top">allowempty</td>
+			<td valign="top">Allow empty value.</br>
+				<i>Note:</i> If the value is empty, the property won't be set.</td>
+			<td align="center" valign="top">No; defaults to false.</td>
+		</tr>
+		<tr>
+			<td valign="top">tooltip</td>
+			<td valign="top">The text to display when the cursor lingers over the component.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">icon</td>
+			<td valign="top">The icon of the label. This can have one of four values ("question", "information", "warning" or "error").</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+	</table>
+	
+	<ul><li><b><code>&lt;fileselection&gt;</code> element</b></li></ul>
+	<p>
+		Displays a file (or directory) selection interface.
+	</p>
+	<h5>Parameters</h5>
+	<table border="1" cellpadding="2" cellspacing="0">
+		<tr>
+			<td valign="top"><b>Attribute</b></td>
+			<td valign="top"><b>Description</b></td>
+			<td align="center" valign="top"><b>Required</b></td>
+		</tr>
+		<tr>
+			<td valign="top">text</td>
+			<td valign="top">The text of the label.</td>
+			<td align="center" valign="top">Yes</td>
+		</tr>
+		<tr>
+			<td valign="top">property</td>
+			<td valign="top">The name of the property that will be set to the value of the text field.</td>
+			<td align="center" valign="top">Yes</td>
+		</tr>
+		<tr>
+			<td valign="top">mode</td>
+			<td valign="top">The selection mode. This must whether be "file" or "directory".</td>
+			<td align="center" valign="top">No; defaults to "directory".</td>
+		</tr>
+		<tr>
+			<td valign="top">allowempty</td>
+			<td valign="top">Allow empty value.</br>
+				<i>Note:</i> If the value is empty, the property won't be set.</td>
+			<td align="center" valign="top">No; defaults to false.</td>
+		</tr>
+		<tr>
+			<td valign="top">allownotexist</td>
+			<td valign="top">Allow to enter file / directory path that do not exists.</td>
+			<td align="center" valign="top">No; defaults to false.</td>
+		</tr>
+		<tr>
+			<td valign="top">default</td>
+			<td valign="top">A default value to initialize the selection to (only if the property wasn't loaded from the properties file).</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">tooltip</td>
+			<td valign="top">The text to display when the cursor lingers over the component.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">icon</td>
+			<td valign="top">The icon of the label. This can have one of four values ("question", "information", "warning" or "error").</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+	</table>
+
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+ Copyright (c) 2012 LeanPulse. All rights reserved.
+ 
+ Author: Aurélien PROST (a.prost@leanpulse.com)
+-->
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="ext/ant/stylesheets/style.css">
+<link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico">
+<title>LeanPulse BibAnt User Manual</title>
+<base target="mainFrame" />
+</head>
+
+<body>
+
+<h1><a name="feedback">Feedback</a> and Troubleshooting</h1>
+
+<p>
+	If things do not work, especially simple things like <tt>bibant -version</tt>, then something is wrong with your configuration. Before
+	filing bug reports or emailing us, please do:
+</p>
+	<ol>
+		<li>Check your environment variables. Is JAVA_HOME correct and pointing to a valid JRE / JDK (&gt;= 1.5)? If it has quotes or trailing slashes, remove them.</li>
+		<li>Is your PATH correct? Is BibAnt on it? What about JRE/bin or JDK/bin? If you've installed BibAnt for the first time with the option
+			checked to add BibAnt to the PATH (this is the default), have you restarted your computer? This is sometimes required to get the new
+			PATH definition taken in account.</li>
+		<li>If a task doesn't do what you expect, run <tt>bibant -verbose</tt> or <tt>bibant -debug</tt> to see what is happening.</li>
+	</ol>
+	<p>
+		If you can't fix your problem, send us <a href="mailto:dev@leanpulse.com?subject=Issue with BibAnt">an email</a>.
+	</p>
+	<p>
+		If you think you've found a bug and are a registered customer, you can report it to our <a href="http://its.leanpulse.com/" target="_blank">Issue Tracking System</a>.
+	</p>
+	<p>
+		If you're struggling to develop a BibAnt script to support your documentation process, do <a href="mailto:services@leanpulse.com?subject=BibAnt Support">email us</a>,
+		we're here to help!
+	</p>
+
+</body>
+</html>

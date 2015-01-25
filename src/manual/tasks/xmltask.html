@@ -1,0 +1,890 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+ Copyright (c) 2012 LeanPulse. All rights reserved.
+ 
+ Author: Aurélien PROST (a.prost@leanpulse.com)
+-->
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../ext/ant/stylesheets/style.css">
+<link rel="shortcut icon" type="image/x-icon" href="../images/favicon.ico">
+<title>XmlTask Task</title>
+</head>
+
+<body>
+
+	<h2>
+		<a name="xmltask">XmlTask</a>
+	</h2>
+	
+	<h3>Description</h3>
+	
+	<p>
+		<code>xmltask</code> allows you to specify sections of an XML file to iterate over, append to, replace, remove or modify. The sections of the
+		XML document to	be read or modified are specified by XPath references, and the XML to insert can be specified in-line in the Ant build.xml,
+		or loaded from files.
+	</p>
+	<p>
+		The main <code>&lt;xmltask&gt;</code> section takes arguments to define an XML source and a destination file or directory. Note that the XML
+		source is optional if you're creating a new document via <code>&lt;xmltask&gt;</code> instructions. <code>dest</code> and <code>todir</code>
+		can be omitted if you're reading a document and storing subsections in buffers for use by another task (see below).<br/>
+	</p>
+	<p>
+		<em>For more information about XPath, please report to the <a href="http://www.w3schools.com/xpath/" target="_blank">W3C tutorial</a>
+		and <a href="http://www.w3.org/TR/xpath/" target="_blank">W3C specification</a>.</em>
+	</p>
+	
+	<h3>Parameters</h3>
+	
+	<table border="1" cellpadding="2" cellspacing="0">
+		<tr>
+			<td valign="top"><b>Attribute</b></td>
+			<td valign="top"><b>Description</b></td>
+			<td align="center" valign="top"><b>Required</b></td>
+		</tr>
+		<tr>
+			<td valign="top">source</td>
+			<td valign="top">The source XML file to load.</td>
+			<td valign="top" align="center">No</td>
+		</tr>
+		<tr>
+			<td valign="top">sourcebuffer</td>
+			<td valign="top">The source <a href="#buffer">buffer</a> containing XML from a previous <code>&lt;xmltask>&gt;</code> invocation. The buffer must contain a single
+			root node (i.e be well-formed). If the buffer is empty, then this has the effect of starting with a blank document.</td>
+			<td valign="top" align="center">No</td>
+		</tr>
+		<tr>
+			<td valign="top">dest</td>
+			<td valign="top">The output XML file to write to.</td>
+			<td valign="top" align="center">No</td>
+		</tr>
+		<tr>
+			<td valign="top">destbuffer</td>
+			<td valign="top">The output buffer to write to.</td>
+			<td valign="top" align="center">No</td>
+		</tr>
+		<tr>
+			<td valign="top">todir</td>
+			<td valign="top">The output directory to write to.</td>
+			<td valign="top" align="center">No</td>
+		</tr>
+		<tr>
+			<td valign="top">report</td>
+			<td valign="top">When set to <code>true</code>, will result in diagnostic output.</td>
+			<td valign="top" align="center">No, defaults to <code>false</code>.</td>
+		</tr>
+		<tr>
+			<td valign="top">expandEntityReferences</td>
+			<td valign="top">When set to <code>true</code>, will enable entity reference expansion.</td>
+			<td valign="top" align="center">No, defaults to <code>true</code>.</td>
+		</tr>
+		<tr>
+			<td valign="top">public</td>
+			<td valign="top">Sets the PUBLIC identifier in the output XML DOCTYPE declaration.</td>
+			<td valign="top" align="center">No</td>
+		</tr>
+		<tr>
+			<td valign="top">system</td>
+			<td valign="top">sets the SYSTEM identifier in the output XML DOCTYPE declaration.</td>
+			<td valign="top" align="center">No</td>
+		</tr>
+		<tr>
+			<td valign="top">preservetype</td>
+			<td valign="top">When set to <code>true</code> sets the PUBLIC and SYSTEM identifiers to those of the original document.</td>
+			<td valign="top" align="center">No, defaults to <code>false</code>.</td>
+		</tr>
+		<tr>
+			<td valign="top">failWithoutMatch</td>
+			<td valign="top">When set to <code>true</code> will stop the <code>xmltask</code> task (and hence the build process) if any subtask
+				fails to match nodes using the given XPath path.</td>
+			<td valign="top" align="center">No, defaults to <code>false</code>.</td>
+		</tr>
+		<tr>
+			<td valign="top">indent</td>
+			<td valign="top">Enables indented formatting of the resultant document.</td>
+			<td valign="top" align="center">No, defaults to <code>true</code>.</td>
+		</tr>
+		<tr>
+			<td valign="top">encoding</td>
+			<td valign="top">Determines the character encoding value for the output document.</td>
+			<td valign="top" align="center">No</td>
+		</tr>
+		<tr>
+			<td valign="top">outputter</td>
+			<td valign="top">Determines the output mechanism to be used. See <a href="#formatting">formatting</a> for more info.</td>
+			<td valign="top" align="center">No</td>
+		</tr>
+		
+		<tr>
+			<td valign="top">omitHeader</td>
+			<td valign="top">When set to <code>true</code> forces omission of the &lt;?xml...?&gt; header. Note that the XML spec specifies the
+				header SHOULD be included, but this is not mandated for XML v1.0.</td>
+			<td valign="top" align="center">No, defaults to <code>false</code>.</td>
+		</tr>
+		<tr>
+			<td valign="top">standalone</td>
+			<td valign="top">Sets the <code>standalone</code> attribute of the header.</td>
+			<td valign="top" align="center">No, defaults to <code>false</code>.</td>
+		</tr>
+		<tr>
+			<td valign="top">clearBuffers</td>
+			<td valign="top">Clears buffers after population by previous <code>xmltask</code> invocations. Buffers are cleared after every input
+				file is processed. Buffers are specified in a comma-delimited string.</td>
+			<td valign="top" align="center">No</td>
+		</tr>
+	</table>
+	
+	<h3>Parameters specified as nested elements</h3>
+
+	<h4>fileset</h4>
+	<p>
+		<a href="../ext/ant/Types/fileset.html">FileSet</a>s are used to define sets of files for <code>xmltask</code> to operate on.
+	</p>
+	
+	<h4>nested XML operation elements</h4>
+	<p>
+		Nested elements allow replacements to take place, and are applied in the order that they're specified in. Each subsection may match zero or
+		more nodes. Standard XPath paths are used here.
+	</p>
+	
+	<ul><li><b><code>&lt;cut&gt;</code> element</b></li></ul>
+	<p>
+		The <code>&lt;cut&gt;</code> element allows an XML section to be cut and stored in a <a href="#buffer">buffer</a> or a property. Multiple
+		XML nodes or elements can be cut to a buffer or property by using the <code>append</code> attribute.
+	<p>
+	<h5>Parameters</h5>
+	<table border="1" cellpadding="2" cellspacing="0">
+		<tr>
+			<td valign="top"><b>Attribute</b></td>
+			<td valign="top"><b>Description</b></td>
+			<td align="center" valign="top"><b>Required</b></td>
+		</tr>
+		<tr>
+			<td valign="top">path</td>
+			<td valign="top">The XPath reference of the element(s) to cut.</td>
+			<td align="center" valign="top">Yes</td>
+		</tr>
+		<tr>
+			<td valign="top">buffer</td>
+			<td valign="top">The buffer to store the cut XML.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">property</td>
+			<td valign="top">The property to store the cut XML.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">append</td>
+			<td valign="top">When set to <scode>true</code>, <i>appends</i> to the given buffer or property. You can only append when creating a new
+				property since Ant properties are immutable (i.e. when an XPath resolves to multiple text nodes).</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">attrValue</td>
+			<td valign="top">Cutting an attribute will result in the <i>whole</i> attribute plus value being cut. When <code>attrValue</code>
+				is set to <code>true</code> then only the attribute's <i>value</i> is cut. This is <i>implicit</i> for cutting to properties.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">trim</td>
+			<td valign="top">Trims leading/trailing spaces when writing to properties.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">propertySeparator</td>
+			<td valign="top">Defines the separating string when appending properties.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">if</td>
+			<td valign="top">Only performed if the given property is set.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">unless</td>
+			<td valign="top">Performed <i>unless</i> the given property is set.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+	</table>
+	<h5>Examples</h5>
+	<pre>&lt;cut path=&quot;web/servlet/context/root[@id='2']/text()&quot; buffer=&quot;namedBuffer&quot;/&gt;
+&lt;cut path=&quot;web/servlet/context/root[@id='2']/text()&quot; property=&quot;property1&quot;/&gt;</pre>
+
+	<ul><li><b><code>&lt;copy&gt;</code> element</b></li></ul>
+	<p>
+		The <code>&lt;copy&gt;</code> element allows an XML section to be copied and stored in a <a href="#buffer">buffer</a> or a property. Multiple
+		XML nodes or elements can be copied to a buffer or property by using the <code>append</code> attribute.
+	<p>
+	<h5>Parameters</h5>
+	<table border="1" cellpadding="2" cellspacing="0">
+		<tr>
+			<td valign="top"><b>Attribute</b></td>
+			<td valign="top"><b>Description</b></td>
+			<td align="center" valign="top"><b>Required</b></td>
+		</tr>
+		<tr>
+			<td valign="top">path</td>
+			<td valign="top">The XPath reference of the element(s) to copy.</td>
+			<td align="center" valign="top">Yes</td>
+		</tr>
+		<tr>
+			<td valign="top">buffer</td>
+			<td valign="top">The buffer to store the copied XML.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">property</td>
+			<td valign="top">The property to store the copied XML.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">append</td>
+			<td valign="top">When set to <code>true</code>,	<i>appends</i> to the given buffer or property. You can only append	when creating a new
+				property since Ant properties are immutable (i.e. when an XPath resolves to multiple text nodes).</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">attrValue</td>
+			<td valign="top">Copying an attribute will result in the <i>whole</i> attribute plus value being cut. When <codes>attrValue</code>
+				is set to <code>true</code> then only the attribute's <i>value</i> is copied. This is <i>implicit</i> for copying to properties.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">propertySeparator</td>
+			<td>Defines the separating string when appending properties.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">trim</td>
+			<td>Trims leading/trailing spaces when writing to properties.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">if</td>
+			<td>Only performed if the given property is set.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">unless</td>
+			<td valign="top">Performed <i>unless</i> the given property is set.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+	</table>
+	<h5>Examples</h5>
+	<pre>&lt;copy path=&quot;web/servlet/context/root[@id='2']/text()&quot; buffer=&quot;namedBuffer&quot;/&gt;
+&lt;copy path=&quot;web/servlet/context/root[@id='2']/text()&quot; property=&quot;property1&quot;/&gt;</pre>
+
+	<ul><li><b><code>&lt;insert&gt;</code> element</b></li></ul>
+	<p>
+		The <code>&lt;insert&gt;</code> element allows the contents of a <a href="#buffer">buffer</a> or a property to be inserted into an XML
+		document. You can specify an XML node and the XML to insert below or alongside it.
+	<p>
+	<h5>Parameters</h5>
+	<table border="1" cellpadding="2" cellspacing="0">
+		<tr>
+			<td valign="top"><b>Attribute</b></td>
+			<td valign="top"><b>Description</b></td>
+			<td align="center" valign="top"><b>Required</b></td>
+		</tr>
+		<tr>
+			<td valign="top">path</td>
+			<td valign="top">The XPath reference of the element(s) to insert into.</td>
+			<td align="center" valign="top">Yes</td>
+		</tr>
+		<tr>
+			<td valign="top">buffer</td>
+			<td valign="top">The buffer to paste.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">file</td>
+			<td valign="top">The file to paste.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">xml</td>
+			<td valign="top">The literal XML to paste.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">expandProperties</td>
+			<td valign="top">Indicates whether properties in body text XML are expanded or not.</td>
+			<td align="center" valign="top">No, defaults to <code>true</code>.</td>
+		</tr>
+		<tr>
+			<td valign="top">position</td>
+			<td>Where the XML is to be inserted in relation to the XML highlighted by path. The allowed positions are <code>before</code>, <code>after</code>,
+				or <code>under</code>.</td>
+			<td align="center" valign="top">No, defaults to <code>under</code></td>
+		</tr>
+		<tr>
+			<td valign="top">if</td>
+			<td>Only performed if the given property is set.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">unless</td>
+			<td valign="top">Performed <i>unless</i> the given property is set.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+	</table>
+	<h5>Examples</h5>
+	<pre>&lt;insert path=&quot;/web/servlet/context/root[@attr='val']&quot; xml=&quot;&amp;lt;B/&amp;gt;&quot;/&gt;
+&lt;insert path=&quot;/web/servlet/context/root[@attr='val']&quot; file=&quot;insert.xml&quot;/&gt;
+&lt;insert path=&quot;/web/servlet/context/root[@attr='val']&quot; buffer=&quot;namedBuffer&quot; position=&quot;before&quot;/&gt;
+&lt;insert path=&quot;/web/servlet/context/root[@attr='val']&quot; xml=&quot;${property1}&quot; position=&quot;before&quot;/&gt;</pre>
+	<p>
+		The XML to insert can be specified as body text within the <code>&lt;insert&gt;</code> task:
+	</p>
+	<pre>&lt;insert path=&quot;web/servlet/context/root[@id='2']/text()&quot;&gt; 
+  &lt;![CDATA[ 
+    &lt;node/&gt;
+  ]]&gt;
+&lt;/insert&gt;</pre>
+	<p>
+		Note that the XML has to be specified within a <code>CDATA</code> section. Ant properties are expanded within these sections, unless
+		<code>expandProperties</code> is set to <code>false</code>.
+	</p>
+	<p>
+		You can create a new document by not specifying a source file, and making the first instruction for <code>&lt;xmltask&gt;</code> an
+		<code>&lt;insert&gt;</code> with the appropriate root node (and any subnodes).
+	</p>
+	
+	<ul><li><b><code>&lt;replace&gt;</code> element</b></li></ul>
+	<p>
+		The <code>&lt;replace&gt;</code> element allows you to specify an XML node and what to replace it with.
+	<p>
+	<h5>Parameters</h5>
+	<table border="1" cellpadding="2" cellspacing="0">
+		<tr>
+			<td valign="top"><b>Attribute</b></td>
+			<td valign="top"><b>Description</b></td>
+			<td align="center" valign="top"><b>Required</b></td>
+		</tr>
+		<tr>
+			<td valign="top">path</td>
+			<td valign="top">The XPath reference of the element(s) to replace. If this represents an attribute, then the value of the attribute will be changed.
+				In this scenario you can only specify text as replacement.</td>
+			<td align="center" valign="top">Yes</td>
+		</tr>
+		<tr>
+			<td valign="top">withText</td>
+			<td valign="top">The text to insert in place of the nominated nodes.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">withXml</td>
+			<td valign="top">The literal XML to insert in place of the nominated nodes.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">withFile</td>
+			<td valign="top">The file containing XML to insert in place of the nominated nodes.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">withBuffer</td>
+			<td valign="top">The buffer containing XML to insert in place of the nominated nodes.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">expandProperties</td>
+			<td valign="top">Indicates whether properties in body text XML are expanded or not.</td>
+			<td align="center" valign="top">No, defaults to <code>true</code>.</td>
+		</tr>
+		<tr>
+			<td valign="top">if</td>
+			<td>Only performed if the given property is set.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">unless</td>
+			<td valign="top">Performed <i>unless</i> the given property is set.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+	</table>
+	<h5>Examples</h5>
+	<pre>&lt;replace path=&quot;web/servlet/context/root[@id='2']/text()&quot; withText=&quot;2&quot;/&gt;
+&lt;replace path=&quot;web/servlet/context/root[@id='2']/@id&quot; withText=&quot;3&quot;/&gt;
+&lt;replace path=&quot;web/servlet/context/root[@id='2']/text()&quot; withXml=&quot;&amp;lt;id&amp;gt;&quot;/&gt;
+&lt;replace path=&quot;web/servlet/context/root[@id='2']/&quot; withFile=&quot;substitution.xml&quot;/&gt;
+&lt;replace path=&quot;web/servlet/context/root[@id='2']/&quot; withBuffer=&quot;namedBuffer&quot;/&gt;</pre>
+	<p>
+		The XML to insert can be specified as body text within the <code>&lt;insert&gt;</code> task:
+	</p>
+	<pre>&lt;replace path=&quot;web/servlet/context/root[@id='2']/text()&quot;&gt; 
+  &lt;![CDATA[ 
+    &lt;node/&gt;
+  ]]&gt;
+&lt;/replace&gt;</pre>
+	<p>
+		Note that the XML has to be specified within a <code>CDATA</code> section. Ant properties are expanded within these sections, unless
+		<code>expandProperties</code> is set to <code>false</code>.
+	</p>
+	
+	<ul><li><b><code>&lt;attr&gt;</code> element</b></li></ul>
+	<p>
+		The <code>&lt;attr&gt;</code> element allows you to specify an XML node and how to add, change or remove its attributes.
+	<p>
+	<h5>Parameters</h5>
+	<table border="1" cellpadding="2" cellspacing="0">
+		<tr>
+			<td valign="top"><b>Attribute</b></td>
+			<td valign="top"><b>Description</b></td>
+			<td align="center" valign="top"><b>Required</b></td>
+		</tr>
+		<tr>
+			<td valign="top">path</td>
+			<td valign="top">The XPath reference of the element(s) to be changed.</td>
+			<td align="center" valign="top">Yes</td>
+		</tr>
+		<tr>
+			<td valign="top">attr</td>
+			<td valign="top">The name of the attribute to be added/changed or removed.</td>
+			<td align="center" valign="top">Yes</td>
+		</tr>
+		<tr>
+			<td valign="top">value</td>
+			<td valign="top">The value to set the attribute to.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">remove</td>
+			<td valign="top">Indicates that the nominated attribute should be removed.</td>
+			<td align="center" valign="top">No, defaults to <code>false</code></td>
+		</tr>
+		<tr>
+			<td valign="top">if</td>
+			<td>Only performed if the given property is set.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">unless</td>
+			<td valign="top">Performed <i>unless</i> the given property is set.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+	</table>
+	<h5>Examples</h5>
+	<pre>&lt;attr path=&quot;web/servlet/context[@id='4']&quot; attr=&quot;id&quot; value=&quot;test&quot;/&gt;
+&lt;attr path=&quot;web/servlet/context[@id='4']&quot; attr=&quot;id&quot; remove=&quot;true&quot;/&gt;</pre>
+	<p>
+		Note that in the first example, if the attribute <code>id</code> doesn't exist, it will be added.
+	</p>
+
+	<ul><li><b><code>&lt;remove&gt;</code> element</b></li></ul>
+	<p>
+		The <code>&lt;remove&gt;</code> element allows you to specify an XML section to remove.
+	<p>
+	<h5>Parameters</h5>
+	<table border="1" cellpadding="2" cellspacing="0">
+		<tr>
+			<td valign="top"><b>Attribute</b></td>
+			<td valign="top"><b>Description</b></td>
+			<td align="center" valign="top"><b>Required</b></td>
+		</tr>
+		<tr>
+			<td valign="top">path</td>
+			<td valign="top">The XPath reference of the element(s) to be removed.</td>
+			<td align="center" valign="top">Yes</td>
+		</tr>
+		<tr>
+			<td valign="top">if</td>
+			<td>Only performed if the given property is set.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">unless</td>
+			<td valign="top">Performed <i>unless</i> the given property is set.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+	</table>
+	<h5>Examples</h5>
+	<pre>&lt;remove path=&quot;web/servlet/context[@id='redundant']&quot;/&gt;</pre>
+
+	<ul><li><b><code>&lt;regexp&gt;</code> element</b></li></ul>
+	<p>
+		The <code>&lt;regexp&gt;</code> element allows you to specify XML text to change via regular expressions.
+	<p>
+	<h5>Parameters</h5>
+	<table border="1" cellpadding="2" cellspacing="0">
+		<tr>
+			<td valign="top"><b>Attribute</b></td>
+			<td valign="top"><b>Description</b></td>
+			<td align="center" valign="top"><b>Required</b></td>
+		</tr>
+		<tr>
+			<td valign="top">path</td>
+			<td valign="top">The XPath reference of the element(s) to be changed or copied.</td>
+			<td align="center" valign="top">Yes</td>
+		</tr>
+		<tr>
+			<td valign="top">pattern</td>
+			<td valign="top">The regular expression to apply to the text node or attribute value.</td>
+			<td align="center" valign="top">Yes</td>
+		</tr>
+		<tr>
+			<td valign="top">replace</td>
+			<td valign="top">The text to replace the matched expression with.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">property</td>
+			<td valign="top">The property to copy the matched expression into. A capturing group must be used to specify the text to capture.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">buffer</td>
+			<td valign="top">The buffer to copy the matched expression into. A capturing group must be used to specify the text to capture.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">casesensitive</td>
+			<td valign="top">Sets case sensitivity of the regular expression.</td>
+			<td align="center" valign="top">No, defaults to <code>true</code></td>
+		</tr>
+		<tr>
+			<td valign="top">if</td>
+			<td>Only performed if the given property is set.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">unless</td>
+			<td valign="top">Performed <i>unless</i> the given property is set.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+	</table>
+	<p>
+		The <code>&lt;regexp&gt;</code> element uses the standard Java regular expression mechanism. Replacements can make use of capturing groups.
+		When copying to a buffer or a property, a capturing group must be specified to determine the text to be copied.
+	</p>
+	<h5>Examples</h5>
+	<pre>&lt;regexp path=&quot;/web-app/servlet/servlet-name/text()&quot; pattern=&quot;Test&quot; replace=&quot;Prod&quot;/&gt;
+&lt;regexp path=&quot;/web-app/servlet/servlet-name/text()&quot; pattern=&quot;Servlet-([a-z])-([0-9]*)&quot; replace=&quot;Servlet-$2-$1&quot;/&gt;
+&lt;regexp path=&quot;/web-app/servlet/servlet-name/text()&quot; pattern=&quot;(.*)Test&quot; property=&quot;servlet.name&quot;/&gt;
+&lt;regexp path=&quot;/web-app/servlet/servlet-name/text()&quot; pattern=&quot;(.*)Test&quot; buffer=&quot;servlet.name&quot;/&gt;</pre>
+	<p>
+		Note the use of the capturing groups to reverse components of the servlet's name, or to determine the servlet name substring to copy to a
+		buffer or property.
+	</p>
+
+	<ul><li><b><code>&lt;rename&gt;</code> element</b></li></ul>
+	<p>
+		The <code>&lt;rename&gt;</code> element allows you to specify an XML element or attribute to rename.
+	<p>
+	<h5>Parameters</h5>
+	<table border="1" cellpadding="2" cellspacing="0">
+		<tr>
+			<td valign="top"><b>Attribute</b></td>
+			<td valign="top"><b>Description</b></td>
+			<td align="center" valign="top"><b>Required</b></td>
+		</tr>
+		<tr>
+			<td valign="top">path</td>
+			<td valign="top">The XPath reference of the element(s) to be renamed.</td>
+			<td align="center" valign="top">Yes</td>
+		</tr>
+		<tr>
+			<td valign="top">to</td>
+			<td valign="top">The new node name.</td>
+			<td align="center" valign="top">Yes</td>
+		</tr>
+		<tr>
+			<td valign="top">if</td>
+			<td>Only performed if the given property is set.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">unless</td>
+			<td valign="top">Performed <i>unless</i> the given property is set.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+	</table>
+	<h5>Examples</h5>
+	<pre>&lt;rename path=&quot;a/b/c[@id='1']&quot; to=&quot;d&quot;/&gt;
+&lt;rename path=&quot;a/b/@c&quot; to=&quot;d&quot;/&gt;</pre>
+
+	<ul><li><b><code>&lt;call&gt;</code> element</b></li></ul>
+	<p>
+		The <code>&lt;call&gt;</code> element allows you to perform actions or call Ant targets in the same <code>build.xml</code> file
+		for nodes identified by an XPath.
+	<p>
+	<h5>Parameters</h5>
+	<table border="1" cellpadding="2" cellspacing="0">
+		<tr>
+			<td valign="top"><b>Attribute</b></td>
+			<td valign="top"><b>Description</b></td>
+			<td align="center" valign="top"><b>Required</b></td>
+		</tr>
+		<tr>
+			<td valign="top">path</td>
+			<td valign="top">The XPath reference of the element(s) to be identified.</td>
+			<td align="center" valign="top">Yes</td>
+		</tr>
+		<tr>
+			<td valign="top">target</td>
+			<td valign="top">The Ant target to call for each identified node.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">buffer</td>
+			<td valign="top">The buffer to use to store each identified node (for the duration of the target call).</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">inheritAll</td>
+			<td valign="top">Indicates if the target being called inherits all properties.</td>
+			<td align="center" valign="top">No, defaults to <code>true</code></td>
+		</tr>
+		<tr>
+			<td valign="top">inheritRefs</td>
+			<td valign="top">Indicates if the target being called inherits all references.</td>
+			<td align="center" valign="top">No, defaults to <code>false</code></td>
+		</tr>
+		<tr>
+			<td valign="top">if</td>
+			<td>Only performed if the given property is set.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">unless</td>
+			<td valign="top">Performed <i>unless</i> the given property is set.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+	</table>
+	<h5>Examples</h5>
+	<pre>&lt;call path=&quot;a/b/c&quot; target=&quot;CNode&quot; buffer=&quot;abc&quot;/&gt;</pre>
+	<p>
+		In the example above, the Ant target <code>CNode</code> is called for each occurrence of the C node in the given XPath expression.
+		For each call to <code>CNode</code> the buffer <code>abc</code> is populated with the node identified (plus any subnodes).
+	</p>
+	<p>
+		In the example below, Ant actions are embedded within the <code>&lt;call&gt;</code> action.
+	</p>
+	<pre>&lt;call path=&quot;a/b/c&quot;&gt;
+  &lt;actions&gt;
+    &lt;echo>Found a node under a/b/c&lt;/echo&gt;
+  &lt;/actions&gt;
+&lt;/call&gt;</pre>
+	<p>
+		Properties can be set for the target being called using XPath syntax or simply as existing properties or static strings: 
+	</p>
+	<pre>&lt;call path=&quot;a/b/c&quot; target=&quot;CNode&quot; buffer=&quot;abc&quot;&gt;
+  &lt;param name=&quot;val&quot; path=&quot;text()&quot;/&gt; 
+  &lt;param name=&quot;id&quot; path=&quot;@id&quot; default=&quot;n/a&quot;/&gt; 
+  &lt;param name=&quot;os&quot; value=&quot;${os.name}&quot;/&gt; 
+&lt;/call&gt;</pre>
+	<p>
+		This will call the Ant target <code>CNode</code> as above, but for each invocation, the property <code>val</code> is set to the value of
+		the text node under C, and the property <code>id</code> is set to the corresponding <code>id</code> attribute. If the <code>id</code>
+		attribute is missing then <code>n/a</code> will be substituted. <code>os</code> is set to the OS.
+	</p>
+	<p>
+		The same can be done for <i>embedded</i> actions:
+	</p>
+	<pre>&lt;call path=&quot;a/b/c&quot;&gt;
+  &lt;param name=&quot;val&quot; path=&quot;text()&quot;/&gt; 
+  &lt;param name=&quot;id&quot; path=&quot;@id&quot; default=&quot;n/a&quot;/&gt; 
+  &lt;param name=&quot;os&quot; value=&quot;${os.name}&quot;/&gt; 
+  &lt;actions&gt; 
+    &lt;echo&gt;val = @{val}&lt;/echo&gt;
+    &lt;echo&gt;id = @{id}&lt;/echo&gt;
+  &lt;/actions&gt; 
+&lt;/call&gt;</pre>
+	<p>
+		Note how the parameters are dereferenced in this example (using <code>@{...}</code>). Note also that for embedded actions each property
+		<i>must</i> have a value assigned to it. If in doubt use the default attribute in the <code>&lt;param&gt;</code> instruction.
+	</p>
+
+	<ul><li><b><code>&lt;print&gt;</code> element</b></li></ul>
+	<p>
+		The <code>&lt;print&gt;</code> element allows you to dump out to standard output the XML matching a given XPath expression, or the contents
+		of a buffer. This is a considerable help in performing debugging of scripts.
+	<p>
+	<h5>Parameters</h5>
+	<table border="1" cellpadding="2" cellspacing="0">
+		<tr>
+			<td valign="top"><b>Attribute</b></td>
+			<td valign="top"><b>Description</b></td>
+			<td align="center" valign="top"><b>Required</b></td>
+		</tr>
+		<tr>
+			<td valign="top">path</td>
+			<td valign="top">The XPath reference of the element(s) to be identified.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">buffer</td>
+			<td valign="top">The buffer to print out.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">comment</td>
+			<td>A corresponding comment to print out.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+	</table>
+	<h5>Examples</h5>
+	<pre>&lt;print path=&quot;a/b/c&quot; comment=&quot;Nodes matching a/b/c&quot;/&gt;
+&lt;print buffer=&quot;buffer1&quot; comment=&quot;Contents of buffer 1&quot;/&gt;</pre>
+	<p>
+		This instruction has no effect on the documents being scanned or generated.
+	</p>
+	
+	<ul><li><b><code>&lt;xmlcatalog&gt;</code> element</b></li></ul>
+	<p>
+		<code>xmltask</code> supports the Ant <a href="../ext/ant/Types/xmlcatalog.html"><code>&lt;xmlcatalog&gt;</code></a> element, which allows you
+		to specify local copies of DTDs. This allows you to specify a DOCTYPE referred to in the original document, and the local DTD to use instead
+		(useful if you're behind firewalls and the like).
+	<p>
+	<h5>Example</h5>
+	<pre>&lt;xmlcatalog id=&quot;dtds&quot;&gt;
+ &lt;dtd publicId=&quot;-//OOPS Consultancy//DTD Test 1.0//EN&quot; location=&quot;./local.dtd&quot;/&gt;
+&lt;/xmlcatalog&gt;
+
+&lt;xmltask source=&quot;18.xml&quot; dest=&quot;18-out.xml&quot; report=&quot;true&quot;&gt;
+  &lt;xmlcatalog refid=&quot;dtds&quot;/&gt;
+ &lt;!-- set a text element to a value --&gt;
+ ...
+&lt;/xmltask&gt;</pre>
+
+	<ul><li><b><code>&lt;uncomment&gt;</code> element</b></li></ul>
+	<p>
+		The <code>&lt;uncomment&gt;</code> element allows you to uncomment sections of XML. This means you can maintain different XML fragments within
+		one document and enable a subset. For instance you can maintain different configs and only enable one at deployment.
+	<p>
+	<h5>Parameters</h5>
+	<table border="1" cellpadding="2" cellspacing="0">
+		<tr>
+			<td valign="top"><b>Attribute</b></td>
+			<td valign="top"><b>Description</b></td>
+			<td align="center" valign="top"><b>Required</b></td>
+		</tr>
+		<tr>
+			<td valign="top">path</td>
+			<td valign="top">The XPath of the comment to uncomment. This must resolve to a comment within the input document.</td>
+			<td align="center" valign="top">Yes</td>
+		</tr>
+		<tr>
+			<td valign="top">if</td>
+			<td>Only performed if the given property is set.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+		<tr>
+			<td valign="top">unless</td>
+			<td valign="top">Performed <i>unless</i> the given property is set.</td>
+			<td align="center" valign="top">No</td>
+		</tr>
+	</table>
+	<h5>Examples</h5>
+	<pre>&lt;xmltask source=&quot;server.xml&quot; dest=&quot;server.xml&quot; report=&quot;true&quot;&gt;
+  &lt;!-- enables a servlet configuration --&gt;
+  &lt;uncomment path=&quot;/server/service[@name='Tomcat-Standalone']/comment()&quot;/&gt;
+ ...
+&lt;/xmltask&gt;</pre>
+
+	<ul><li><b>The sections above can be chained together to provide successive modifications to an XML file:</b></li></ul>
+	<pre>&lt;target name=&quot;main&quot;&gt;
+ &lt;xmltask source=&quot;input.xml&quot; 
+     dest=&quot;output.xml 
+     public=&quot;//Sun Microsystems, Inc.//DTD Web Application 2.2//EN&quot;
+     system=&quot;http://java.sun.com/j2ee/dtds/web-app_2_2.dtd&quot;
+     report=&quot;true&quot;&gt;
+  &lt;replace path=&quot;web/servlet/context/config[@id='1']/text()&quot; withFile=&quot;config1.xml&quot;/&gt;
+  &lt;replace path=&quot;web/servlet/context/config[@id='2']/text()&quot; withFile=&quot;config2.xml&quot;/&gt;
+  &lt;insert path=&quot;/web/security/&quot; file=&quot;uat.security.xml&quot;/&gt;
+  &lt;remove path=&quot;web/servlet/context/config[@id='4']&quot;/&gt;
+ &lt;/xmltask&gt;
+&lt;/target&gt;</pre>
+	<p>
+		Here the report attribute is enabled to view the XML transformations as they occur. The input is loaded from <code>input.xml</code>
+		and the output will go to <code>output.xml</code>. The files <code>config1/2.xml</code> replace the text below the appropriate
+		<code>&lt;config&gt;</code> nodes, the file <code>security.xml</code> is inserted and then the config id <code>#4</code> is removed.
+		<code>output.xml</code> will be output with the appropriate DOCTYPE setting for a Servlet 2.2 web.xml (using the public/system settings
+		- note that if <code>input.xml</code> has the public and system ids set already, <code>preserveType="true"</code> could be used here).
+	</p>
+	
+	<h3><a name="buffer">Buffers</a></h3>
+	<p>
+		Buffers are used to store nodes found by <code>&lt;cut&gt;</code> and <code>&lt;copy&gt;</code> operations, and those nodes can be
+		inserted into a document using <code>&lt;insert&gt;</code>.
+	</p>
+	<p>
+		Buffers exist for the duration of the Ant process and consequently can be used across multiple invocations of <code>&lt;xmltask&gt;</code>.
+		The following is possible:
+	</p>
+	<pre>&lt;target name=&quot;cut&quot;&gt;
+  &lt;xmltask source=&quot;input.xml&quot; dest=&quot;1.xml &gt;
+    &lt;cut path=&quot;web/servlet/context/config[@id='4']&quot; buffer=&quot;storedXml&quot; /&gt;
+  &lt;/xmltask&gt;
+&lt;/target&gt;
+
+&lt;target name=&quot;paste&quot; depends=&quot;cut&quot;&gt;
+  &lt;xmltask source=&quot;input.xml&quot; dest=&quot;output.xml &gt;
+    &lt;paste path=&quot;web/servlet/context/config[@id='5'] buffer=&quot;storedXml&quot; /&gt;
+  &lt;/xmltask&gt;
+&lt;/target&gt;</pre>
+	<p>
+		So the buffer <code>storedXml</code> is maintained across multiple targets.
+	</p>
+	<p>
+		Buffers are simply defined by names. eg. valid buffers would be <code>servlet</code>, <code>buffer100</code> etc.
+	</p>
+	<p>
+		A buffer can record multiple nodes (either resulting from multiple matches or multiple <code>&lt;cut&gt;</code> / <code>&lt;copy&gt;</code>
+		 operations). This operation is enabled through use of the append attribute. e.g.
+	</p>
+	<pre>&lt;cut path=&quot;web/servlet/context/config&quot; buffer=&quot;storedXml&quot; append=&quot;true&quot; /&gt;</pre>
+	<p>
+		A buffer can store all types of XML nodes e.g. text / elements / attributes. Note that when recording an attribute node, both the name of the
+		attribute and the value will be recorded. To store the value alone of an attribute, the <code>attrValue</code> attribute can be used e.g.
+	</p>
+	<pre>&lt;copy path=&quot;web/servlet/@id&quot; buffer=&quot;id&quot; attrValue=&quot;true&quot; /&gt;</pre>
+	<p>
+		This will store the value of the <code>id</code> attribute. The value can be used as a text node in a subsequent <code>&lt;insert&gt;</code>.
+		Buffers can be persisted to files. This permits buffers to be used across Ant invocations, and uses of <code>&lt;antcall&gt;</code>. To persist
+		a buffer to a file, simply name it using a file URL. e.g.
+	</p>
+	<pre>&lt;cut path=&quot;/a/b&quot; buffer=&quot;file://build/buffers/1&quot;/&gt;</pre>
+    <p>
+    	and the operation will write the cut XML to a file <code>build/buffers/1</code>. This file will persist after Ant exits, so care should be taken
+    	to remove this if required. The file will be created automatically, but any directories required must exist prior to the buffer being used.
+	</p>
+	
+	<h3><a name="formatting">Formatting</a></h3>
+	<p>
+		The formatting of the output document is controlled by the attribute <code>outputter</code>. There are two options:
+	</p>
+	<pre>&lt;xmltask outputter=&quot;default&quot;... </pre>
+	<p>
+		outputs the document as is. That is to say, all whitespace etc. is preserved. This is the default option. Note that attribute ordering may change
+		and elements containing attributes may be split over several lines etc. ie. the document remains the same semantically.
+	</p>
+	<pre>&lt;xmltask outputter=&quot;simple&quot;... </pre>
+	<p>
+		outputs the document with a degree of formatting. Elements are indented and given new lines wherever possible to make a more readable document.
+		This is not suitable for all applications since some XML consumers will be whitespace sensitive.
+	</p>
+	<p>
+		Spacing can be adjusted by using <code>&lt;xmltask outputter=&quot;simple:{indent}&quot;...</code> . e.g.
+		<code>&lt;xmltask outputter=&quot;simple:1&quot;...</code> results in:
+	</p>
+	<pre>&lt;root&gt;
+ &lt;branch/&gt;
+&lt;/root&gt;</pre>
+  	<p>
+  		The indent level can be increased: <code>&lt;xmltask outputter=&quot;simple:4&quot;...</code> results in:
+  	</p>
+    <pre>&lt;root&gt;
+    &lt;branch/&gt;
+&lt;/root&gt;</pre>
+
+	<p>
+		<em>The <code>xml2task</code> is provided by <a href="http://www.oopsconsultancy.com/index.html" target="_blank">OOPS Consultancy</a>.
+		This documentation is a reformat of the manual available on their website.</em>
+	</p>
+
+</body>
+</html>

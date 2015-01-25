@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+ Copyright (c) 2012 LeanPulse. All rights reserved.
+ 
+ Author: Aurélien PROST (a.prost@leanpulse.com)
+-->
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../ext/ant/stylesheets/style.css">
+<link rel="shortcut icon" type="image/x-icon" href="../images/favicon.ico">
+<title>ExtractMetadata Task</title>
+</head>
+
+<body>
+
+	<h2>
+		<a name="extractmetadata">ExtractMetadata</a>
+	</h2>
+	
+	<h3>Description</h3>
+	
+	<p>
+		Extracts the metadata of a file or a set of files. The output is an XML file listing the files scanned and giving, for each one of them,
+		the collection of metadata extracted in a name / value pair fashion.
+	</p>
+	<p>
+		The <code>&lt;extractmetadata&gt;</code> task supports all the major document formats i.e. <i>Microsoft Office document formats</i> (Word,
+		Excel, PowerPoint, etc., from Office 97), <i>OpenDocument Format</i> (any versions of OpenOffice, LibreOffice), <i>Rich Text Format</i>
+		(RTF), <i>Portable Document Format</i> (PDF), <i>Electronic Publication Format</i> (EPUB).
+	</p>
+	<p>
+		The skeleton of the XML file generated is given below.
+	</p>
+	<blockquote>
+		<pre>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;bib:metaextraction xmlns:bib=&quot;http://www.leanpulse.com/schemas/bibant/2012/core&quot;&gt;
+   &lt;bib:file name=&quot;<i>FILE-NAME</i>&quot; ext=&quot;<i>FILE-EXTENSION</i>&quot; path=&quot;<i>FILE-PATH</i>&quot; type=&quot;<i>FILE-MIME-TYPE</i>&quot;&gt;
+      &lt;bib:metadata name=&quot;<i>METADATA-NAME</i>&quot;&gt;<i>METADATA-VALUE</i>&lt;/bib:metadata&gt;
+      ...
+   &lt;/bib:file&gt;
+   ...
+&lt;/bib:metaextraction&gt;</pre>
+	</blockquote>
+
+	<h3>Parameters</h3>
+	
+	<table border="1" cellpadding="2" cellspacing="0">
+		<tr>
+			<td valign="top"><b>Attribute</b></td>
+			<td valign="top"><b>Description</b></td>
+			<td valign="top" align="center"><b>Required</b></td>
+		</tr>
+		<tr>
+			<td valign="top">file</td>
+			<td valign="top">The file from which extract the metadata.</td>
+			<td valign="top" align="center">Yes, unless a nested resource collection element is used.</td>
+		</tr>
+		<tr>
+			<td valign="top">metafile</td>
+			<td valign="top">The output XML file to write the extracted metadata to.</td>
+			<td valign="top" align="center">Yes</td>
+		</tr>
+		<tr>
+			<td valign="top">failonerror</td>
+			<td valign="top">If false, log a warning message, but do not stop
+				the build, when an error occurs while extracting the metadata
+				from a given file.</td>
+			<td valign="top" align="center">No, defaults to false.</td>
+		</tr>
+	</table>
+
+	<h3>Parameters specified as nested elements</h3>
+	
+	<h4>fileset or any other resource collection</h4>
+	<p>
+		<a href="../ext/ant/Types/resources.html#collection">Resource Collection</a>s are used to select groups of files to extract the metadata from.
+	</p>
+
+	<h3>Example</h3>
+	
+	<p>
+		The following example extracts to <code>metadata.xml</code> the metadata of the Word, Excel, OpenOffice and PDF documents in the directory
+		<code>docs</code>.
+	</p>
+	<pre>&lt;extractmetadata metafile=&quot;metadata.xml&quot;&gt;
+  &lt;fileset dir=&quot;docs&quot;&gt;
+    &lt;include name=&quot;*.doc&quot;&gt;
+    &lt;include name=&quot;*.xls&quot;&gt;
+    &lt;include name=&quot;*.odt&quot;&gt;
+    &lt;include name=&quot;*.pdf&quot;&gt;
+  &lt;/fileset&gt;
+&lt;/extractmetadata&gt;</pre>
+
+</body>
+</html>

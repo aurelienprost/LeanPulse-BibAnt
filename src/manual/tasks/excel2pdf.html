@@ -1,0 +1,185 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+ Copyright (c) 2013 LeanPulse. All rights reserved.
+ 
+ Author: Aurélien PROST (a.prost@leanpulse.com)
+-->
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../ext/ant/stylesheets/style.css">
+<link rel="shortcut icon" type="image/x-icon" href="../images/favicon.ico">
+<title>Excel2Pdf Task</title>
+</head>
+
+<body>
+
+	<h2>
+		<a name="excel2pdf">Excel2Pdf</a>
+	</h2>
+	
+	<h3>Description</h3>
+	
+	<p>
+		Prints a MS Excel file or resource collection to PDF. This task is the specialization
+		of the <a href="print2pdf.html">Print2Pdf</a> task for MS Excel compatible workbooks
+		(*.xls, *.xlsx, *.csv, etc.). It adds in particular options to select which worksheet(s)
+		to print, their orientation and how they will be scaled in the printed page(s).
+	</p>
+	<p>
+		<strong>Note: </strong>The Excel2Pdf task relies on Microsoft Office Excel and
+		<a href="http://www.pdfforge.org/pdfcreator" target="_blank">PDFCreator</a>
+		to print the files. Valid installations of both softwares must be present.
+	</p>
+	
+	<h3>Parameters</h3>
+	
+	<table border="1" cellpadding="2" cellspacing="0">
+		<tr>
+			<td valign="top"><b>Attribute</b></td>
+			<td valign="top"><b>Description</b></td>
+			<td align="center" valign="top"><b>Required</b></td>
+		</tr>
+		<tr>
+			<td valign="top">file</td>
+			<td valign="top">The file to print.</td>
+			<td valign="top" align="center">Yes, unless a nested resource collection element is used.</td>
+		</tr>
+		<tr>
+			<td valign="top">tofile</td>
+			<td valign="top">The file to print to.</td>
+			<td valign="top" align="center" rowspan="2">With the <code>file</code>
+				attribute, either <code>tofile</code> or <code>todir</code> can be
+				used.<br />
+				With nested resource collection elements, if the number
+				of included resources is greater than 1, or if only the <code>dir</code>
+				attribute is specified in the <code>&lt;fileset&gt;</code>, or if
+				the <code>file</code> attribute is also specified, then only <code>todir</code>
+				is allowed.<br/>
+				If both <code>tofile</code> and <code>todir</code> are omitted, the PDFs
+				will be created alongside the source files.
+			</td>
+		</tr>
+		<tr>
+			<td valign="top">todir</td>
+			<td valign="top">The directory to copy to.</td>
+		</tr>
+		<tr>
+			<td valign="top">sheets</td>
+			<td valign="top">Whether to print all the sheets in the workbook, only the active one or a given selection.
+				The value can be set respectively to "all", "active" or a list of sheet names separated by whitespace, or commas.</td>
+			<td valign="top" align="center">No; default value is "all" (print all the sheets).</td>
+		</tr>
+		<tr>
+			<td valign="top">orientation</td>
+			<td valign="top">The orientation in which to print the sheets.
+				This can have one of two values ("portrait" or "landscape").</td>
+			<td valign="top" align="center">No; default value is "portrait".</td>
+		</tr>
+		<tr>
+			<td valign="top">fittopageswide</td>
+			<td valign="top">Sets the number of pages wide the worksheet will be scaled to when it's printed.</td>
+			<td valign="top" align="center">No</td>
+		</tr>
+		<tr>
+			<td valign="top">fittopagestall</td>
+			<td valign="top">Sets the number of pages tall the worksheet will be scaled to when it's printed.</td>
+			<td valign="top" align="center">No</td>
+		</tr>
+		<tr>
+			<td valign="top">visible</td>
+			<td valign="top">Control whether the Excel application will be visible or not during the print.</td>
+			<td valign="top" align="center">No; defaults to false.</td>
+		</tr>
+		<tr>
+			<td valign="top">force</td>
+			<td valign="top">Recreate target files, even if they are newer than their corresponding
+				source files.</td>
+			<td valign="top" align="center">No; defaults to false.</td>
+		</tr>
+		<tr>
+			<td valign="top">preservelastmodified</td>
+			<td valign="top">Give the printed files the same last modified
+				time as the original source files.</td>
+			<td valign="top" align="center">No; defaults to false.</td>
+		</tr>
+		<tr>
+			<td valign="top">flatten</td>
+			<td valign="top">Ignore the directory structure of the source
+				files, and print all files into the directory specified by the <code>todir</code>
+				attribute.
+			</td>
+			<td valign="top" align="center">No; defaults to false.</td>
+		</tr>
+		<tr>
+			<td valign="top">failonerror</td>
+			<td valign="top">If false, log a warning message, but do not
+				stop the build, when the file to print does not exist or one of the
+				nested filesets points to a directory that doesn't exist or an error
+				occurs while printing.</td>
+			<td valign="top" align="center">No; defaults to true.</td>
+		</tr>
+	</table>
+	
+	<h3>Parameters specified as nested elements</h3>
+
+	<h4>fileset or any other resource collection</h4>
+	<p>
+		<a href="../ext/ant/Types/resources.html#collection">Resource Collection</a>s
+		are used to select groups of files to print. To define the directory
+		where the PDFs will be saved, the <code>todir</code> attribute can be set.
+		If omitted, the PDFs will be created alongside the source files.
+	</p>
+
+	<h4>mapper</h4>
+	<p>
+		You can define filename transformations by using a nested
+		<a href="../ext/ant/Types/mapper.html">mapper</a> element. The default mapper
+		used by	<code>&lt;excel2pdf&gt;</code> is a
+		<a href="../ext/ant/Types/mapper.html#regexp-mapper">regexp	mapper</a> that
+		replaces the source file extension with the pdf extension.
+	</p>
+	<p>
+		<strong>Warning: </strong>The mapper will set the extension of the printed
+		files. Ensure that you stick to the pdf extension to make the destination
+		files directly identified as PDF documents.
+	</p>
+	<p>
+		Note that the source name handed to the mapper depends on the resource
+		collection you use. If you use <code>&lt;fileset&gt;</code>
+		or any other collection that provides a base directory, the name
+		passed to the mapper will be a relative filename, relative to the base
+		directory. In any other case the absolute filename of the source will
+		be used.
+	</p>
+
+	<h3>Examples</h3>
+	
+	<p><b>Print to PDF a single Excel workbook</b></p>
+	<pre>&lt;excel2pdf file=&quot;myfile.xls&quot;/&gt;
+
+&lt;excel2pdf file=&quot;myfile.xls&quot; tofile=&quot;myfile.pdf&quot;/&gt;</pre>
+	
+	<p><b>Print to PDF a single Excel workbook to a directory</b></p>
+	<pre>&lt;excel2pdf file=&quot;myfile.xlsx&quot; todir=&quot;../some/other/dir&quot;/&gt;</pre>
+
+	<p><b>Print to PDF all Excel workbooks to a directory and scale all the worksheets to fit one page wide.</b></p>
+	<pre>&lt;excel2pdf todir=&quot;../dest/dir&quot; fittopageswide=&quot;1&quot;&gt;
+  &lt;fileset dir=&quot;src_dir&quot;&gt;
+    &lt;include name=&quot;**/*.xls&quot;/&gt;
+  &lt;/fileset&gt;
+&lt;/excel2pdf&gt;
+
+&lt;excel2pdf todir=&quot;../dest/dir&quot; fittopageswide=&quot;1&quot;&gt;
+  &lt;fileset dir=&quot;src_dir&quot; includes=&quot;**/*.xls&quot;/&gt;
+&lt;/excel2pdf&gt;</pre>
+
+	<p><b>Print to PDF all Excel files to a directory, appending <code>-conv</code> to the file name on the fly</b></p>
+	<pre>&lt;excel2pdf todir=&quot;../conv/dir&quot;&gt;
+  &lt;fileset dir=&quot;src_dir&quot; includes=&quot;**/*.xls&quot;/&gt;
+  &lt;globmapper from=&quot;*.xls&quot; to=&quot;*-conv.pdf&quot;/&gt;
+&lt;/excel2pdf&gt;</pre>
+
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+ Copyright (c) 2012 LeanPulse. All rights reserved.
+ 
+ Author: Aurélien PROST (a.prost@leanpulse.com)
+-->
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../ext/ant/stylesheets/style.css">
+<link rel="shortcut icon" type="image/x-icon" href="../images/favicon.ico">
+<title>ExtFileFromDB Task</title>
+</head>
+
+<body>
+
+	<h2>
+		<a name="extfilefromdb">ExtFileFromDB</a>
+	</h2>
+	
+	<h3>Description</h3>
+	
+	<p>
+		Executes an SQL statement via JDBC to a database to extract a file stored in it. The SQL statement is specified as nested
+		text or CDATA section of the <code>&lt;extfilefromdb&gt;</code> task.
+	</p>
+	<p>
+		The execution of the statement must return a single column result with a binary type. If several rows are returned, only the first
+		one will be extracted. If the result is empty, no file will be created and the build process will carry on unless the
+		<code>failifempty</code> attribute is set to <code>true</code>.
+	</p>
+	<p>
+		<strong>Note on JDBC drivers:</strong> BibAnt only includes by default the JDBC driver to connect to MySQL databases. To load
+		additional drivers, you can use the <code>classpath</code> attribute or nested element.
+	</p>
+
+	<h3>Parameters</h3>
+	
+	<table border="1" cellpadding="2" cellspacing="0">
+		<tr>
+			<td valign="top"><b>Attribute</b></td>
+			<td valign="top"><b>Description</b></td>
+			<td valign="top" align="center"><b>Required</b></td>
+		</tr>
+		<tr>
+			<td valign="top">driver</td>
+			<td valign="top">The class name of the JDBC driver.</td>
+			<td valign="top" align="center">Yes</td>
+		</tr>
+		<tr>
+			<td valign="top">url</td>
+			<td valign="top">The database connection url.</td>
+			<td valign="top" align="center">Yes</td>
+		</tr>
+		<tr>
+			<td valign="top">userid</td>
+			<td valign="top">The database user name.</td>
+			<td valign="top" align="center">Yes</td>
+		</tr>
+		<tr>
+			<td valign="top">password</td>
+			<td valign="top">The database password.</td>
+			<td valign="top" align="center">Yes</td>
+		</tr>
+		<tr>
+			<td valign="top">tofile</td>
+			<td valign="top">The file to which extract the binary data.</td>
+			<td valign="top" align="center">Yes</td>
+		</tr>
+		<tr>
+			<td valign="top">classpath</td>
+			<td valign="top">The classpath used to load the JDBC driver.</td>
+			<td valign="top" align="center">No (use system classpath)</td>
+		</tr>
+		<tr>
+			<td valign="top">classpathref</td>
+			<td valign="top">The classpath to use, given as a <a href="../ext/ant/using.html#references">reference</a>
+				to a path defined elsewhere.</td>
+			<td valign="top" align="center">No (use system classpath)</td>
+		</tr>
+		<tr>
+			<td valign="top">failifempty</td>
+			<td valign="top">When set to <code>true</code> will stop the <code>extfilefromdb</code> task (and hence the build process)
+				if the SQL command didn't return any result and no file was extracted.</td>
+			<td valign="top" align="center">No, defaults to <code>false</code>.</td>
+		</tr>
+	</table>
+
+	<h3>Parameters specified as nested elements</h3>
+	
+	<h4>CDATA section</h4>
+	<p>
+		To define the SQL statement to execute, you can embed the code in a <code>&lt;![CDATA[</code> ... <code>]]&gt;</code> section
+		so you don't need to escape	<code>&lt;</code>, <code>&gt;</code> <code>&amp;</code>	or other special characters.
+	</p>
+
+	<h4>classpath</h4>
+	<p>
+		<code>Sql</code>'s <em>classpath</em> attribute is a <a href="../ext/ant/using.html#path">PATH like structure</a> and can also be set
+		via a nested <em>classpath</em> element. It is used to load the JDBC classes.
+	</p>
+
+	<h4>connectionProperty</h4>
+	<p>
+		Use nested <code>&lt;connectionProperty&gt;</code> elements to specify additional JDBC properties that need to be set
+		when connecting to the database.
+	</p>
+	<table border="1" cellpadding="2" cellspacing="0">
+		<tr>
+			<td valign="top"><b>Attribute</b></td>
+			<td valign="top"><b>Description</b></td>
+			<td valign="top" align="center"><b>Required</b></td>
+		</tr>
+		<tr>
+			<td valign="top">name</td>
+			<td valign="top">The name of the property.</td>
+			<td valign="top" align="center">Yes</td>
+		</tr>
+		<tr>
+			<td valign="top">value</td>
+			<td valign="top">The value of the property.</td>
+			<td valign="top" align="center">Yes</td>
+		</tr>
+	</table>
+
+	<h3>Example</h3>
+	
+	<pre>&lt;extfilefromdb driver=&quot;org.database.jdbcDriver&quot; url=&quot;jdbc:database-url&quot; userid=&quot;sa&quot; password=&quot;pass&quot;
+tofile=&quot;document.pdf&quot;&gt;
+  &lt;![CDATA[SELECT attachment_binary FROM attachment
+      INNER JOIN spec ON attachment_fk_spec_id = spec_id
+      WHERE spec_fk_reference_id = '${spec.ref}' AND spec_ver = ${spec.ver}
+          AND lower(attachment_name) LIKE '%.pdf']]&gt;
+&lt;/extfilefromdb&gt;</pre>
+
+</body>
+</html>

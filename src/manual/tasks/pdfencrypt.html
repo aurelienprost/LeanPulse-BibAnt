@@ -1,0 +1,134 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+ Copyright (c) 2012 LeanPulse. All rights reserved.
+ 
+ Author: Aurélien PROST (a.prost@leanpulse.com)
+-->
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../ext/ant/stylesheets/style.css">
+<link rel="shortcut icon" type="image/x-icon" href="../images/favicon.ico">
+<title>PdfEncrypt Task</title>
+</head>
+
+<body>
+
+	<h2>
+		<a name="pdfencrypt">PdfEncrypt</a>
+	</h2>
+	
+	<h3>Description</h3>
+	
+	<p>
+		Encrypts a PDF file or a set of PDF files.
+	</p>
+	
+	<h3>Parameters</h3>
+	
+	<table border="1" cellpadding="2" cellspacing="0">
+		<tr>
+			<td valign="top"><b>Attribute</b></td>
+			<td valign="top"><b>Description</b></td>
+			<td align="center" valign="top"><b>Required</b></td>
+		</tr>
+		<tr>
+			<td valign="top">file</td>
+			<td valign="top">The file to encrypt.</td>
+			<td valign="top" align="center">Yes, unless a nested resource collection element is used.</td>
+		</tr>
+		<tr>
+			<td valign="top">ownerpassword</td>
+			<td valign="top">The owner password.</td>
+			<td valign="top" align="center">Yes; unless <code>certfile</code> is defined.</td>
+		</tr>
+		<tr>
+			<td valign="top">userpassword</td>
+			<td valign="top">The user password.</td>
+			<td valign="top" align="center">Yes; unless <code>certfile</code> is defined.</td>
+		</tr>
+		<tr>
+			<td valign="top">certfile</td>
+			<td valign="top">The X.509 certificate file.</td>
+			<td valign="top" align="center">No</td>
+		</tr>
+		<tr>
+			<td valign="top">keylength</td>
+			<td valign="top">The number of bits for the encryption key.</td>
+			<td valign="top" align="center">No; default is 40.</td>
+		</tr>
+		<tr>
+			<td valign="top">canassemble</td>
+			<td valign="top">The assemble permission.</td>
+			<td valign="top" align="center">No; default is true.</td>
+		</tr>
+		<tr>
+			<td valign="top">canextractcontent</td>
+			<td valign="top">The extraction permission.</td>
+			<td valign="top" align="center">No; default is true.</td>
+		</tr>
+		<tr>
+			<td valign="top">canextractforaccessibility</td>
+			<td valign="top">The extraction for accessibility permission.</td>
+			<td valign="top" align="center">No; default is true.</td>
+		</tr>
+		<tr>
+			<td valign="top">canfillinform</td>
+			<td valign="top">The fill in form permission.</td>
+			<td valign="top" align="center">No; default is true.</td>
+		</tr>
+		<tr>
+			<td valign="top">canmodify</td>
+			<td valign="top">The modify permission.</td>
+			<td valign="top" align="center">No; default is true.</td>
+		</tr>
+		<tr>
+			<td valign="top">canmodifyannotations</td>
+			<td valign="top">The modify annotations permission.</td>
+			<td valign="top" align="center">No; default is true.</td>
+		</tr>
+		<tr>
+			<td valign="top">canprint</td>
+			<td valign="top">The print permission.</td>
+			<td valign="top" align="center">No; default is true.</td>
+		</tr>
+		<tr>
+			<td valign="top">canprintdegraded</td>
+			<td valign="top">The print degraded permission.</td>
+			<td valign="top" align="center">No; default is true.</td>
+		</tr>
+		<tr>
+			<td valign="top">preservelastmodified</td>
+			<td valign="top">Preserve the last modified time of PDF files.</td>
+			<td valign="top" align="center">No; defaults to false.</td>
+		</tr>
+		<tr>
+			<td valign="top">failonerror</td>
+			<td valign="top">If false, log a warning message, but do not stop
+				the build, when the PDF file to encrypt does not exist or an error
+				occurs while encrypting.</td>
+			<td valign="top" align="center">No; defaults to true.</td>
+		</tr>
+	</table>
+	
+	<h3>Parameters specified as nested elements</h3>
+
+	<h4>fileset or any other resource collection</h4>
+	<p>
+		<a href="../ext/ant/Types/resources.html#collection">Resource Collection</a>s
+		are used to select groups of PDFs to encrypt.
+	</p>
+
+	<h3>Examples</h3>
+	
+	<p><b>Encrypt a single PDF</b></p>
+	<pre>&lt;pdfencrypt file=&quot;myfile.pdf&quot; ownerpassword=&quot;ownerpass&quot; userpassword=&quot;userpass&quot;/&gt;</pre>
+	
+	<p><b>Encrypt all PDFs in a directory and its sub-directories</b></p>
+	<pre>&lt;pdfencrypt ownerpassword=&quot;ownerpass&quot; userpassword=&quot;userpass&quot;&gt;
+  &lt;fileset dir=&quot;pdf_dir&quot; includes=&quot;**/*.pdf&quot;/&gt;
+&lt;/pdfencrypt&gt;</pre>
+
+</body>
+</html>

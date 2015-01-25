@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+ Copyright (c) 2012 LeanPulse. All rights reserved.
+ 
+ Author: Aurélien PROST (a.prost@leanpulse.com)
+-->
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../ext/ant/stylesheets/style.css">
+<link rel="shortcut icon" type="image/x-icon" href="../images/favicon.ico">
+<title>PdfSetOpenAction Task</title>
+</head>
+
+<body>
+
+	<h2>
+		<a name="pdfsetopenaction">PdfSetOpenAction</a>
+	</h2>
+	
+	<h3>Description</h3>
+	
+	<p>
+		Sets the JavaScript open action for a PDF file or a set of PDF files.
+	</p>
+	
+	<h3>Parameters</h3>
+	
+	<table border="1" cellpadding="2" cellspacing="0">
+		<tr>
+			<td valign="top"><b>Attribute</b></td>
+			<td valign="top"><b>Description</b></td>
+			<td align="center" valign="top"><b>Required</b></td>
+		</tr>
+		<tr>
+			<td valign="top">file</td>
+			<td valign="top">The PDF to add the open action to.</td>
+			<td valign="top" align="center">Yes, unless a nested resource collection element is used.</td>
+		</tr>
+		<tr>
+			<td valign="top">openaction</td>
+			<td valign="top">The JavaScript open action.</td>
+			<td valign="top" align="center">Yes, unless JavaScript is enclosed within tags.</td>
+		</tr>
+		<tr>
+			<td valign="top">preservelastmodified</td>
+			<td valign="top">Preserve the last modified time of PDF files.</td>
+			<td valign="top" align="center">No; defaults to false.</td>
+		</tr>
+		<tr>
+			<td valign="top">failonerror</td>
+			<td valign="top">If false, log a warning message, but do not stop
+				the build, when the PDF file to process does not exist or an error
+				occurs while adding the open action.</td>
+			<td valign="top" align="center">No; defaults to true.</td>
+		</tr>
+	</table>
+	
+	<h3>Parameters specified as nested elements</h3>
+
+	<h4>fileset or any other resource collection</h4>
+	<p>
+		<a href="../ext/ant/Types/resources.html#collection">Resource Collection</a>s
+		are used to select groups of PDFs to process.
+	</p>
+	
+	<h4>CDATA section</h4>
+	<p>
+		To define a complex JavaScript script as the open action, you can embed the code in a
+		<code>&lt;![CDATA[</code> ... <code>]]&gt;</code> section so you don't need to escape
+		<code>&lt;</code>, <code>&gt;</code> <code>&amp;</code>	or other special characters.
+	</p>
+
+	<h3>Examples</h3>
+	
+	<p><b>Set the open action for a single PDF</b></p>
+	<pre>&lt;pdfsetopenaction file=&quot;myfile.pdf&quot; openaction=&quot;app.alert('Hello World!');&quot;/&gt;
+	
+&lt;pdfsetopenaction file=&quot;myfile.pdf&quot;&gt;
+  &lt;![CDATA[app.alert('Hello World!');]]&gt;
+&lt;/pdfsetopenaction&gt;</pre>
+	
+	<p><b>Set the open action for all PDFs in a directory and its sub-directories</b></p>
+	<pre>&lt;pdfsetopenaction openaction=&quot;app.alert('Hello World!');&quot;&gt;
+  &lt;fileset dir=&quot;pdf_dir&quot; includes=&quot;**/*.pdf&quot;/&gt;
+&lt;/pdfsetopenaction&gt;</pre>
+
+</body>
+</html>
